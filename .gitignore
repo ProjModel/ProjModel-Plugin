@@ -1,0 +1,37 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Maven
+projmodel/target/
+projmodel/pom.xml.tag
+projmodel/pom.xml.releaseBackup
+projmodel/pom.xml.versionsBackup
+projmodel/pom.xml.next
+projmodel/release.properties
+projmodel/dependency-reduced-pom.xml
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# Atlassian/Jira local runtime artifacts if ever created outside target
+cargo-jira-home/
+jira-home/
+container/
+
+# Java
+*.class
