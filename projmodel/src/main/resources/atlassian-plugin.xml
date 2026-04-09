@@ -18,7 +18,7 @@
         <resource type="download" name="projmodel.js" location="/js/projmodel.js"/>
         <resource type="download" name="images/" location="/images"/>
 
-        <context>projmodel</context>
+        <context>atl.general</context>
     </web-resource>
 
     <servlet name="hello-servlet"
@@ -42,10 +42,5 @@
         <label key="projmodel.menu.label"/>
         <link linkId="projmodel-link">/plugins/servlet/projmodel</link>
     </web-item>
-
-    <web-resource key="projmodel-resources" name="ProjModel Resources">
-        <resource type="download" name="projmodel.css" location="/css/projmodel.css"/>
-        <context>atl.general</context>
-    </web-resource>
     
 </atlassian-plugin>
