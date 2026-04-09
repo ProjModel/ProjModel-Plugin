@@ -1,2 +1,106 @@
-# ProjModel-Plugin
-the plugin for jira to improve users' experience in team working
+# ProjModel Plugin — локальный запуск для разработки
+
+Что нужно установить
+
+Перед началом разработки установите:
+
+- Git
+- JDK 11
+- IntelliJ IDEA
+- Atlassian Plugin SDK 8.2.7
+- Интернет, потому что Maven будет долго качать зависимости при первом запуске
+У нас проект сейчас поднимается именно на таком окружении.
+
+**ОЧЕНЬ ВАЖНО**
+
+1. Не храните проект:
+	на флешке
+	в OneDrive
+	в папке с русскими буквами
+	в слишком длинном пути
+	
+2. Нормальный путь для проекта:
+	C:\dev\ProjModel-Plugin
+	
+**Шаг 1. Клонировать проект**
+
+Открыть терминал и выполнить:
+	git clone <URL_РЕПОЗИТОРИЯ> C:\dev\ProjModel-Plugin
+	cd C:\dev\ProjModel-Plugin\projmodel
+	
+**Шаг 2. Установить JDK 11**
+
+Нужен именно JDK 11, не JRE.
+После установки проверьте в терминале:
+	java -version
+	javac -version
+	
+**Шаг 3. Настроить переменные среды Windows**
+Нужно выставить:
+	JAVA_HOME = путь к JDK 11
+Ну, например:
+	C:\Program Files\Eclipse Adoptium\jdk-11.0.30.7-hotspot
+	
+И также добавить в Path эту штуку:
+	%JAVA_HOME%\bin
+	
+	Весь шаг 3 делается в утилите Пуск-> Изменение переменных среды. у Path эту штуку с java_home добавляйте в самый верх (перетащите потом)
+	
+**Шаг 4. Проверить Atlassian SDK**
+
+В новом терминале выполнить:
+	atlas-version
+	
+**Должно быть видно**:
+	ATLAS Version: 8.2.7
+	Java 11
+	путь к JDK, а не к ...\jre
+	
+**Шаг 5. Открыть проект в IntelliJ IDEA
+
+Открыть папку:
+	C:\dev\ProjModel-Plugin\projmodel
+	
+	потом на всякий, после индексации, откройте в idea maven и нажмите reload all maven projects (sync->reload справа). шоб все работало
+	
+**Шаг 6. Запуск!**
+
+Напишите в терминале прям в idea atlas-run. 
+
+**Важно**:
+		первый запуск может быть долгим
+		команда не завершится сама, пока Jira работает
+		это нормально
+
+Она будет долго думать и говниться, но потом она выдаст вам ссылку на локально развернутую Jira и там уже вы должны будете войти в систему.
+
+
+Логин и пароль для локальной жиры
+	admin
+	admin
+	
+Далее когда вы чет напишите, перезапускайте жиру.
+	1. Ctrl + C
+	2. atlas-run
+	
+Ну и по новой.
+
+**Полезные команды**
+
+Запуск Jira
+	atlas-run
+Остановка Jira
+	Ctrl + C
+Сборка плагина без запуска
+	atlas-package
+Очистка сборки
+	atlas-clean
+	
+**Полезные ссылки**
+
+Локальная Jira
+	http://localhost:2990/jira
+Менеджер плагинов
+	http://localhost:2990/jira/plugins/servlet/upm
+Пример servlet
+	http://localhost:2990/jira/plugins/servlet/hello
