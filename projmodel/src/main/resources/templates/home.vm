@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>$pluginName</title>
+    <link rel="stylesheet" type="text/css" href="/jira/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <h1>$pluginName</h1>
+        <p class="projmodel-subtitle">$pluginDescription</p>
+        <p class="projmodel-version">Version: $pluginVersion</p>
+    </div>
+
+    <div class="projmodel-grid">
+        <div class="projmodel-card">
+            <h2>Deadline Analysis</h2>
+            <p>Визуализация дедлайнов проекта и уровней риска</p>
+            <span class="projmodel-badge">MVP-заглушка</span>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>Reports</h2>
+            <p>Экспорт данных проекта и формирование отчётов</p>
+            <span class="projmodel-badge">Передано в разработку</span>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>Workload</h2>
+            <p>Отслеживание загрузки участников команды</p>
+            <span class="projmodel-badge">Передано в разработку</span>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>AI Analytics</h2>
+            <p>Прогнозы сроков, рисков и аналитические рекомендации</p>
+            <span class="projmodel-badge">Передано в разработку</span>
+        </div>
+    </div>
+
+    <div class="projmodel-footer">
+        Demo page for ProjModel plugin
+    </div>
+</div>
+</body>
+</html>
