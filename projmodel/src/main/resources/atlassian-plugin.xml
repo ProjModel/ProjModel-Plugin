@@ -42,5 +42,10 @@
         <label key="projmodel.menu.label"/>
         <link linkId="projmodel-link">/plugins/servlet/projmodel</link>
     </web-item>
+
+    <web-resource key="projmodel-resources" name="ProjModel Resources">
+        <resource type="download" name="projmodel.css" location="/css/projmodel.css"/>
+        <context>atl.general</context>
+    </web-resource>
     
 </atlassian-plugin>
