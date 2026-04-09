@@ -28,6 +28,13 @@
         <url-pattern>/hello</url-pattern>
     </servlet>
 
+    <servlet name="projmodel-home"
+             key="projmodel-home"
+             class="com.projmodel.plugin.web.HomeServlet">
+        <description>ProjModel home page</description>
+        <url-pattern>/projmodel</url-pattern>
+    </servlet>
+
     <web-item key="projmodel-menu-item"
               name="ProjModel Menu Item"
               section="system.top.navigation.bar"
