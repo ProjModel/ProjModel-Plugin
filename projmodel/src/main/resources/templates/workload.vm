@@ -35,9 +35,6 @@
                 <div class="mock-progress"><div class="mock-progress-bar" style="width: 63%;">63%</div></div>
             </div>
         </div>
-        <p style="margin-top: 30px; font-size: 14px; color: #7a869a;">
-            В финальной версии: реальные данные из Jira, цветовая индикация перегрузки, рекомендации
-        </p>
     </div>
 
     <div class="projmodel-footer">
