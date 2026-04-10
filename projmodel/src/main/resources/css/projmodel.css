@@ -139,3 +139,14 @@ body {
     font-size: 14px;
     font-weight: 500;
 }
+
+.projmodel-badge-link {
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.projmodel-badge-link:hover .projmodel-badge {
+    background: #c0c4cc;
+    transition: 0.2s;
+}

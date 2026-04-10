@@ -33,6 +33,7 @@ public class WorkloadServlet extends HttpServlet {
         context.put("pageDescription", "Отслеживание загрузки участников команды");
         context.put("status", "MVP-заглушка");
         context.put("statusMessage", "Функционал находится в разработке. Здесь будет отображаться загрузка каждого участника проекта.");
+        context.put("req", req);
 
         templateRenderer.render("/templates/workload.vm", context, resp.getWriter());
     }

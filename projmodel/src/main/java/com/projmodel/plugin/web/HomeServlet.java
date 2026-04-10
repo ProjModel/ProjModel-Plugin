@@ -31,6 +31,7 @@ public class HomeServlet extends HttpServlet {
         context.put("pluginName", "ProjModel");
         context.put("pluginVersion", "1.0.0-demo");
         context.put("pluginDescription", "Jira plugin for project analytics and team support");
+        context.put("req", req);
 
         templateRenderer.render("/templates/home.vm", context, resp.getWriter());
     }
