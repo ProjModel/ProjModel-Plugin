@@ -29,7 +29,8 @@
         <div class="projmodel-card">
             <h2>Workload</h2>
             <p>Отслеживание загрузки участников команды</p>
-            <span class="projmodel-badge">Передано в разработку</span>
+            <a href="/plugins/servlet/projmodel/workload" class="projmodel-link">Перейти →</a>
+            <span class="projmodel-badge">MVP-заглушка</span>
         </div>
 
         <div class="projmodel-card">

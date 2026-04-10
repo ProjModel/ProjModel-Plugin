@@ -42,5 +42,13 @@
         <label key="projmodel.menu.label"/>
         <link linkId="projmodel-link">/plugins/servlet/projmodel</link>
     </web-item>
-    
+
+    <!-- Workload Servlet -->
+    <servlet name="projmodel-workload"
+             key="projmodel-workload"
+             class="com.projmodel.plugin.web.WorkloadServlet">
+        <description>ProjModel workload page</description>
+        <url-pattern>/projmodel/workload</url-pattern>
+    </servlet>
+
 </atlassian-plugin>
