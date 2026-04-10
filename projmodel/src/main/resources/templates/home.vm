@@ -17,7 +17,7 @@
         <div class="projmodel-card">
             <h2>Deadline Analysis</h2>
             <p>Визуализация дедлайнов проекта и уровней риска</p>
-            <span class="projmodel-badge">MVP-заглушка</span>
+            <span class="projmodel-badge">перейти</span>
         </div>
 
         <div class="projmodel-card">
@@ -30,7 +30,7 @@
             <h2>Workload</h2>
             <p>Отслеживание загрузки участников команды</p>
             <a href="$req.contextPath/plugins/servlet/projmodel/workload" class="projmodel-badge-link">
-                <span class="projmodel-badge">MVP-заглушка </span>
+                <span class="projmodel-badge">перейти </span>
             </a>
         </div>
 
