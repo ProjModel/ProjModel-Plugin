@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HomeServlet extends HttpServlet {
+public class WorkloadServlet extends HttpServlet {
 
     private final TemplateRenderer templateRenderer;
 
     @Inject
-    public HomeServlet(@ComponentImport TemplateRenderer templateRenderer) {
+    public WorkloadServlet(@ComponentImport TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
     }
 
@@ -29,10 +29,12 @@ public class HomeServlet extends HttpServlet {
 
         Map<String, Object> context = new HashMap<>();
         context.put("pluginName", "ProjModel");
-        context.put("pluginVersion", "1.0.0-demo");
-        context.put("pluginDescription", "Jira plugin for project analytics and team support");
+        context.put("pageTitle", "Workload — загрузка участников");
+        context.put("pageDescription", "Отслеживание загрузки участников команды");
+        context.put("status", "MVP-заглушка");
+        context.put("statusMessage", "Функционал находится в разработке. Здесь будет отображаться загрузка каждого участника проекта.");
         context.put("req", req);
 
-        templateRenderer.render("/templates/home.vm", context, resp.getWriter());
+        templateRenderer.render("/templates/workload.vm", context, resp.getWriter());
     }
 }

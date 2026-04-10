@@ -69,3 +69,84 @@ body {
     font-size: 14px;
     text-align: center;
 }
+
+/* Дополнительные стили для страниц MVP */
+.projmodel-back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #0052cc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.projmodel-back-link:hover {
+    text-decoration: underline;
+}
+
+.projmodel-link {
+    display: inline-block;
+    margin-top: 12px;
+    color: #0052cc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.projmodel-link:hover {
+    text-decoration: underline;
+}
+
+.projmodel-mvp-badge {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff991f;
+    background: #fff0db;
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 40px;
+}
+
+.projmodel-mock-list {
+    max-width: 500px;
+    margin: 30px auto 0;
+    text-align: left;
+}
+
+.mock-item {
+    margin-bottom: 20px;
+}
+
+.mock-name {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #172b4d;
+}
+
+.mock-progress {
+    background: #ebecf0;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 32px;
+}
+
+.mock-progress-bar {
+    background: #36b37e;
+    height: 32px;
+    line-height: 32px;
+    padding-left: 12px;
+    color: white;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.projmodel-badge-link {
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.projmodel-badge-link:hover .projmodel-badge {
+    background: #c0c4cc;
+    transition: 0.2s;
+}
