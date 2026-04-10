@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkloadServlet extends HttpServlet {
+public class DeadlineServlet extends HttpServlet {
 
     private final TemplateRenderer templateRenderer;
 
     @Inject
-    public WorkloadServlet(@ComponentImport TemplateRenderer templateRenderer) {
+    public DeadlineServlet(@ComponentImport TemplateRenderer templateRenderer) {
         this.templateRenderer = templateRenderer;
     }
 
@@ -29,12 +29,12 @@ public class WorkloadServlet extends HttpServlet {
 
         Map<String, Object> context = new HashMap<>();
         context.put("pluginName", "ProjModel");
-        context.put("pageTitle", "Workload — загрузка участников");
-        context.put("pageDescription", "Отслеживание загрузки участников команды");
+        context.put("pageTitle", "Deadline Analysis — анализ дедлайнов");
+        context.put("pageDescription", "Визуализация дедлайнов проекта и уровней риска");
         context.put("status", "В разработке");
         context.put("statusMessage", "Функционал находится в разработке.");
         context.put("req", req);
 
-        templateRenderer.render("/templates/workload.vm", context, resp.getWriter());
+        templateRenderer.render("/templates/deadline.vm", context, resp.getWriter());
     }
 }

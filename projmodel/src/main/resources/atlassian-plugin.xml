@@ -51,4 +51,12 @@
         <url-pattern>/projmodel/workload</url-pattern>
     </servlet>
 
+    <!-- Deadline Servlet -->
+    <servlet name="projmodel-deadline"
+             key="projmodel-deadline"
+             class="com.projmodel.plugin.web.DeadlineServlet">
+        <description>ProjModel deadline analysis page</description>
+        <url-pattern>/projmodel/deadline</url-pattern>
+    </servlet>
+
 </atlassian-plugin>

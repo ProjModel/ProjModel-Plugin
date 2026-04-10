@@ -21,23 +21,103 @@
         <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
             $statusMessage
         </p>
-        <div class="projmodel-mock-list">
-            <div class="mock-item">
-                <span class="mock-name">А</span>
-                <div class="mock-progress"><div class="mock-progress-bar" style="width: 45%;">45%</div></div>
+
+        <!-- Легенда цветов -->
+        <div class="workload-legend">
+            <div class="legend-item">
+                <div class="legend-color legend-green"></div>
+                <span>Нормальная загрузка (до 80%)</span>
             </div>
-            <div class="mock-item">
-                <span class="mock-name">Ар</span>
-                <div class="mock-progress"><div class="mock-progress-bar" style="width: 82%;">82%</div></div>
+            <div class="legend-item">
+                <div class="legend-color legend-yellow"></div>
+                <span>Высокая загрузка (80-100%)</span>
             </div>
-            <div class="mock-item">
-                <span class="mock-name">И</span>
-                <div class="mock-progress"><div class="mock-progress-bar" style="width: 63%;">63%</div></div>
+            <div class="legend-item">
+                <div class="legend-color legend-red"></div>
+                <span>Перегрузка (более 100%)</span>
             </div>
         </div>
-        <p style="margin-top: 30px; font-size: 14px; color: #7a869a;">
-            В финальной версии: реальные данные из Jira, цветовая индикация перегрузки, рекомендации
-        </p>
+
+        <!-- Таблица загрузки участников -->
+        <div class="workload-table-wrapper">
+            <table class="workload-table">
+                <thead>
+                    <tr>
+                        <th>Участник</th>
+                        <th>Роль</th>
+                        <th>Загрузка</th>
+                        <th>Активных задач</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Зелёный - до 80% -->
+                    <tr class="workload-low">
+                        <td class="workload-name">А</td>
+                        <td>Тимлид / Системный аналитик</td>
+                        <td>
+                            <div class="workload-bar-wrapper">
+                                <div class="workload-bar workload-bar-green" style="width: 45%;">45%</div>
+                            </div>
+                        </td>
+                        <td>3 задачи</td>
+                        <td><span class="workload-status status-green">Норма</span></td>
+                    </tr>
+
+                    <!-- Жёлтый - 80-100% -->
+                    <tr class="workload-medium">
+                        <td class="workload-name">Ар</td>
+                        <td>Программист внутренней логики</td>
+                        <td>
+                            <div class="workload-bar-wrapper">
+                                <div class="workload-bar workload-bar-yellow" style="width: 82%;">82%</div>
+                            </div>
+                        </td>
+                        <td>5 задач</td>
+                        <td><span class="workload-status status-yellow">Высокая нагрузка</span></td>
+                    </tr>
+
+                    <!-- Красный - более 100% -->
+                    <tr class="workload-high">
+                        <td class="workload-name">И</td>
+                        <td>Тестировщик / Программист</td>
+                        <td>
+                            <div class="workload-bar-wrapper">
+                                <div class="workload-bar workload-bar-red" style="width: 125%;">125%</div>
+                            </div>
+                        </td>
+                        <td>7 задач</td>
+                        <td><span class="workload-status status-red">Перегрузка!</span></td>
+                    </tr>
+
+                    <!-- Зелёный - до 80% -->
+                    <tr class="workload-low">
+                        <td class="workload-name">Д</td>
+                        <td>Frontend-разработчик</td>
+                        <td>
+                            <div class="workload-bar-wrapper">
+                                <div class="workload-bar workload-bar-green" style="width: 28%;">28%</div>
+                            </div>
+                        </td>
+                        <td>2 задачи</td>
+                        <td><span class="workload-status status-green">Норма</span></td>
+                    </tr>
+
+                    <!-- Жёлтый - 80-100% -->
+                    <tr class="workload-medium">
+                        <td class="workload-name">Е</td>
+                        <td>UX/UI Дизайнер</td>
+                        <td>
+                            <div class="workload-bar-wrapper">
+                                <div class="workload-bar workload-bar-yellow" style="width: 94%;">94%</div>
+                            </div>
+                        </td>
+                        <td>4 задачи</td>
+                        <td><span class="workload-status status-yellow">Высокая нагрузка</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="projmodel-footer">

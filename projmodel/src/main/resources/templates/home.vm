@@ -14,11 +14,13 @@
     </div>
 
     <div class="projmodel-grid">
-        <div class="projmodel-card">
-            <h2>Deadline Analysis</h2>
-            <p>Визуализация дедлайнов проекта и уровней риска</p>
-            <span class="projmodel-badge">MVP-заглушка</span>
-        </div>
+       <div class="projmodel-card">
+           <h2>Deadline Analysis</h2>
+           <p>Визуализация дедлайнов проекта и уровней риска</p>
+           <a href="$req.contextPath/plugins/servlet/projmodel/deadline" class="projmodel-badge-link">
+               <span class="projmodel-badge">перейти</span>
+           </a>
+       </div>
 
         <div class="projmodel-card">
             <h2>Reports</h2>
@@ -30,7 +32,7 @@
             <h2>Workload</h2>
             <p>Отслеживание загрузки участников команды</p>
             <a href="$req.contextPath/plugins/servlet/projmodel/workload" class="projmodel-badge-link">
-                <span class="projmodel-badge">MVP-заглушка </span>
+                <span class="projmodel-badge">перейти </span>
             </a>
         </div>
 
