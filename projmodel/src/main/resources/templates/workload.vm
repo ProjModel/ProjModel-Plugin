@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>$pageTitle</title>
+    <link rel="stylesheet" type="text/css" href="/jira/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <a href="/jira/plugins/servlet/projmodel/home" class="projmodel-back-link">← На главную</a>
+        <h1>$pageTitle</h1>
+        <p class="projmodel-subtitle">$pageDescription</p>
+        <p class="projmodel-version">Version: 1.0.0-demo</p>
+    </div>
+
+    <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
+        <div class="projmodel-mvp-badge">
+             $status
+        </div>
+        <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
+            $statusMessage
+        </p>
+        <div class="projmodel-mock-list">
+            <div class="mock-item">
+                <span class="mock-name">А</span>
+                <div class="mock-progress"><div class="mock-progress-bar" style="width: 45%;">45%</div></div>
+            </div>
+            <div class="mock-item">
+                <span class="mock-name">А</span>
+                <div class="mock-progress"><div class="mock-progress-bar" style="width: 82%;">82%</div></div>
+            </div>
+            <div class="mock-item">
+                <span class="mock-name">И</span>
+                <div class="mock-progress"><div class="mock-progress-bar" style="width: 63%;">63%</div></div>
+            </div>
+        </div>
+        <p style="margin-top: 30px; font-size: 14px; color: #7a869a;">
+            В финальной версии: реальные данные из Jira, цветовая индикация перегрузки, рекомендации
+        </p>
+    </div>
+
+    <div class="projmodel-footer">
+        ProjModel — умный помощник для Jira
+    </div>
+</div>
+</body>
+</html>
