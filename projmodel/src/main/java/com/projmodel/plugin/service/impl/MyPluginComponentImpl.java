@@ -1,4 +1,4 @@
-package com.projmodel.plugin.impl;
+package com.projmodel.plugin.service.impl;
 
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
