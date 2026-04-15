@@ -17,14 +17,20 @@ public class IssueDataServiceImpl implements IssueDataService {
 
     private final SearchService _searchService;
 
+    public IssueDataServiceImpl(SearchService service) {
+        _searchService = service;
+    }
+
     @Override
     public List<Issue> getIssuesForProject(String projectKey) {
-        return List.of();
+        String jql = "project = \"" + projectKey + "\" ORDER BY created DESC";
+        return searchIssuesByJql(jql);
     }
 
     @Override
     public List<Issue> getOpenIssuesForProject(String projectKey) {
-        return List.of();
+        String jql = "project = \"" + projectKey + "\" AND resolution = Unresolved ORDER BY due ASC";
+        return searchIssuesByJql(jql);
     }
 
     private List<Issue> searchIssuesByJql(String jql) {
