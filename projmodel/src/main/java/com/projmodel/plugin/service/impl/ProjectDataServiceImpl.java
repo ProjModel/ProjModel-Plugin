@@ -13,20 +13,39 @@ import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервис по обработке проектов в Jira (предоставляет доступ к проектам в Jira)
+ */
 @Named
 public class ProjectDataServiceImpl implements ProjectDataService
 {
+    /**
+     * Jira-компонент, менеджер, умеющий работать с проектами
+     */
     private final ProjectManager _projectManager;
 
+    /**
+     * Конструктор сервиса
+     * @param manager компонент по работе с проектами
+     */
     public ProjectDataServiceImpl(ProjectManager manager) {
         _projectManager = manager;
     }
 
+    /**
+     * Получить все проекты, которые видит Jira
+     * @return список видимых проектов
+     */
     @Override
     public List<Project> getAllProjects() {
         return new ArrayList<>(_projectManager.getProjectObjects());
     }
 
+    /**
+     * Получить конкретный проект по уникальному ключу
+     * @param projectKey уникальный ключ проекта
+     * @return нужный проект
+     */
     @Override
     public Project getProjectByKey(String projectKey) {
         if(projectKey == null || projectKey.isBlank()) {
