@@ -29,6 +29,10 @@ public class ProjectDataServiceImpl implements ProjectDataService
 
     @Override
     public Project getProjectByKey(String projectKey) {
+        if(projectKey == null || projectKey.isBlank()) {
+            return null;
+        }
+
         return _projectManager.getProjectByCurrentKey(projectKey);
     }
 }
