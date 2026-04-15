@@ -18,6 +18,10 @@ public class ProjectDataServiceImpl implements ProjectDataService
 {
     private final ProjectManager _projectManager;
 
+    public ProjectDataServiceImpl(ProjectManager manager) {
+        _projectManager = manager;
+    }
+
     @Override
     public List<Project> getAllProjects() {
         return new ArrayList<>(_projectManager.getProjectObjects());
