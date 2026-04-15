@@ -28,6 +28,7 @@ public class ProjectDataServiceImpl implements ProjectDataService
      * Конструктор сервиса
      * @param manager компонент по работе с проектами
      */
+    @Inject
     public ProjectDataServiceImpl(ProjectManager manager) {
         _projectManager = manager;
     }

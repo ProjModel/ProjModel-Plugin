@@ -19,7 +19,7 @@ public interface IssueDataService {
     /**
      * Получить список незавершенных задач проекта по уникальному ключу проекта
      * @param projectKey уникальный ключ проекта
-     * @return спислк незавершенных задач проекта
+     * @return список незавершенных задач проекта
      */
     List<Issue> getOpenIssuesForProject(String projectKey);
 }
