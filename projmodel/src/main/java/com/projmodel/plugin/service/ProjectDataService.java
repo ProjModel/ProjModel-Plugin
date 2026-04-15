@@ -9,6 +9,16 @@ import java.util.List;
  */
 public interface ProjectDataService {
 
+    /**
+     * Получить все проекты, которые видит Jira
+     * @return список видимых проектов
+     */
     List<Project> getAllProjects();
+
+    /**
+     * Получить конкретный проект по уникальному ключу
+     * @param projectKey уникальный ключ проекта
+     * @return нужный проект
+     */
     Project getProjectByKey(String projectKey);
 }

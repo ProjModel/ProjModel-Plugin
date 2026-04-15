@@ -9,6 +9,17 @@ import java.util.List;
  */
 public interface IssueDataService {
 
+    /**
+     * Получить список задач проекта по уникальному ключу проекта (например, проект "TEST")
+     * @param projectKey уникальный ключ проекта
+     * @return список задач проекта
+     */
     List<Issue> getIssuesForProject(String projectKey);
+
+    /**
+     * Получить список незавершенных задач проекта по уникальному ключу проекта
+     * @param projectKey уникальный ключ проекта
+     * @return спислк незавершенных задач проекта
+     */
     List<Issue> getOpenIssuesForProject(String projectKey);
 }
