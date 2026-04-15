@@ -8,8 +8,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.projmodel.plugin.service.IssueDataService;
 
 import javax.inject.Named;
-import javax.management.Query;
-import javax.naming.directory.SearchResult;
+import com.atlassian.query.Query;
 import java.util.Collections;
 import java.util.List;
 
