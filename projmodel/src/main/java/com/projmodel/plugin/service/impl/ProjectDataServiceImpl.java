@@ -1,6 +1,7 @@
 package com.projmodel.plugin.service.impl;
 
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.ApplicationProperties;
@@ -9,18 +10,21 @@ import com.projmodel.plugin.service.ProjectDataService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.List;
 
 @Named
 public class ProjectDataServiceImpl implements ProjectDataService
 {
+    private final ProjectManager _projectManager;
+
     @Override
     public List<Project> getAllProjects() {
-        return List.of();
+        return new ArrayList<>(_projectManager.getProjectObjects());
     }
 
     @Override
     public Project getProjectByKey(String projectKey) {
-        return null;
+        return _projectManager.getProjectByCurrentKey(projectKey);
     }
 }
