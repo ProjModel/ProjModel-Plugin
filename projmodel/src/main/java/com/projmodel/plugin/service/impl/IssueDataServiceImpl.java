@@ -5,6 +5,7 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.projmodel.plugin.service.IssueDataService;
 
 import javax.inject.Inject;
@@ -29,7 +30,7 @@ public class IssueDataServiceImpl implements IssueDataService {
      * @param service сервис для выполнения JQL-запросов
      */
     @Inject
-    public IssueDataServiceImpl(SearchService service) {
+    public IssueDataServiceImpl(@ComponentImport SearchService service) {
         _searchService = service;
     }
 

@@ -29,7 +29,7 @@ public class ProjectDataServiceImpl implements ProjectDataService
      * @param manager компонент по работе с проектами
      */
     @Inject
-    public ProjectDataServiceImpl(ProjectManager manager) {
+    public ProjectDataServiceImpl(@ComponentImport ProjectManager manager) {
         _projectManager = manager;
     }
 
