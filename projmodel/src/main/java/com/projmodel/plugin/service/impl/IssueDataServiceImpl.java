@@ -6,12 +6,14 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.projmodel.plugin.dto.IssueViewDTO;
 import com.projmodel.plugin.service.IssueDataService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import com.atlassian.query.Query;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -84,5 +86,24 @@ public class IssueDataServiceImpl implements IssueDataService {
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Конвертировать Issue в DTO-объект
+     * @param issue задача, которую необходимо конвертировать
+     * @return сконвертированная задача
+     */
+    private IssueViewDTO mapToDTO(Issue issue) {
+        String key = issue.getKey();
+        String summary = issue.getSummary();
+        String status = issue.getStatus().getName();
+
+        String assignee = issue.getAssignee() != null
+                ? issue.getAssignee().getDisplayName()
+                : "Unassigned";
+
+        Date dueDate = issue.getDueDate();
+
+        return new IssueViewDTO(key, summary, status, assignee, dueDate);
     }
 }
