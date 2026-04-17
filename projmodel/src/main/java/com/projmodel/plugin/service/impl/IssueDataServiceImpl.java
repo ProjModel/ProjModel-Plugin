@@ -15,6 +15,7 @@ import com.atlassian.query.Query;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для получения данных о задачах проектов в Jira с использованием языка запросов Jira - JQL
@@ -39,23 +40,31 @@ public class IssueDataServiceImpl implements IssueDataService {
     /**
      * Получить список задач проекта по уникальному ключу проекта (например, проект "TEST")
      * @param projectKey уникальный ключ проекта
-     * @return список задач проекта
+     * @return список задач проекта в формате DTO
      */
     @Override
-    public List<Issue> getIssuesForProject(String projectKey) {
+    public List<IssueViewDTO> getIssuesForProject(String projectKey) {
         String jql = "project = \"" + projectKey + "\" ORDER BY created DESC";
-        return searchIssuesByJql(jql);
+        List<Issue> issues = searchIssuesByJql(jql);
+
+        return issues.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     /**
      * Получить список незавершенных задач проекта по уникальному ключу проекта
      * @param projectKey уникальный ключ проекта
-     * @return список незавершенных задач проекта
+     * @return список незавершенных задач проекта в формате DTO
      */
     @Override
-    public List<Issue> getOpenIssuesForProject(String projectKey) {
+    public List<IssueViewDTO> getOpenIssuesForProject(String projectKey) {
         String jql = "project = \"" + projectKey + "\" AND resolution = Unresolved ORDER BY due ASC";
-        return searchIssuesByJql(jql);
+        List<Issue> issues = searchIssuesByJql(jql);
+
+        return issues.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     /**
