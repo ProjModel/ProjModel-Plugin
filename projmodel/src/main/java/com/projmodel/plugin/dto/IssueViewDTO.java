@@ -20,4 +20,24 @@ public class IssueViewDTO {
         this.assignee = assignee;
         this.dueDate = dueDate;
     }
+
+    public String getKey(){
+        return key;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
 }
