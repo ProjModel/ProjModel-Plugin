@@ -6,13 +6,16 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.projmodel.plugin.dto.IssueViewDTO;
 import com.projmodel.plugin.service.IssueDataService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import com.atlassian.query.Query;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Сервис для получения данных о задачах проектов в Jira с использованием языка запросов Jira - JQL
@@ -37,23 +40,31 @@ public class IssueDataServiceImpl implements IssueDataService {
     /**
      * Получить список задач проекта по уникальному ключу проекта (например, проект "TEST")
      * @param projectKey уникальный ключ проекта
-     * @return список задач проекта
+     * @return список задач проекта в формате DTO
      */
     @Override
-    public List<Issue> getIssuesForProject(String projectKey) {
+    public List<IssueViewDTO> getIssuesForProject(String projectKey) {
         String jql = "project = \"" + projectKey + "\" ORDER BY created DESC";
-        return searchIssuesByJql(jql);
+        List<Issue> issues = searchIssuesByJql(jql);
+
+        return issues.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     /**
      * Получить список незавершенных задач проекта по уникальному ключу проекта
      * @param projectKey уникальный ключ проекта
-     * @return список незавершенных задач проекта
+     * @return список незавершенных задач проекта в формате DTO
      */
     @Override
-    public List<Issue> getOpenIssuesForProject(String projectKey) {
+    public List<IssueViewDTO> getOpenIssuesForProject(String projectKey) {
         String jql = "project = \"" + projectKey + "\" AND resolution = Unresolved ORDER BY due ASC";
-        return searchIssuesByJql(jql);
+        List<Issue> issues = searchIssuesByJql(jql);
+
+        return issues.stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -84,5 +95,24 @@ public class IssueDataServiceImpl implements IssueDataService {
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Конвертировать Issue в DTO-объект
+     * @param issue задача, которую необходимо конвертировать
+     * @return сконвертированная задача
+     */
+    private IssueViewDTO mapToDTO(Issue issue) {
+        String key = issue.getKey();
+        String summary = issue.getSummary();
+        String status = issue.getStatus().getName();
+
+        String assignee = issue.getAssignee() != null
+                ? issue.getAssignee().getDisplayName()
+                : "Unassigned";
+
+        Date dueDate = issue.getDueDate();
+
+        return new IssueViewDTO(key, summary, status, assignee, dueDate);
     }
 }
