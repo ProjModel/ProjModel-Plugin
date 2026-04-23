@@ -1,6 +1,7 @@
 package com.projmodel.plugin.service;
 
 import com.atlassian.jira.project.Project;
+import com.projmodel.plugin.dto.ProjectViewDTO;
 
 import java.util.List;
 
@@ -13,12 +14,12 @@ public interface ProjectDataService {
      * Получить все проекты, которые видит Jira
      * @return список видимых проектов
      */
-    List<Project> getAllProjects();
+    List<ProjectViewDTO> getAllProjects();
 
     /**
      * Получить конкретный проект по уникальному ключу
      * @param projectKey уникальный ключ проекта
      * @return нужный проект
      */
-    Project getProjectByKey(String projectKey);
+    ProjectViewDTO getProjectByKey(String projectKey);
 }

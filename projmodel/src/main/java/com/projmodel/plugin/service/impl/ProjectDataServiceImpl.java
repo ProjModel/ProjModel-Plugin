@@ -6,12 +6,14 @@ import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.projmodel.plugin.api.MyPluginComponent;
+import com.projmodel.plugin.dto.ProjectViewDTO;
 import com.projmodel.plugin.service.ProjectDataService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Сервис по обработке проектов в Jira (предоставляет доступ к проектам в Jira)
@@ -38,8 +40,11 @@ public class ProjectDataServiceImpl implements ProjectDataService
      * @return список видимых проектов
      */
     @Override
-    public List<Project> getAllProjects() {
-        return new ArrayList<>(_projectManager.getProjectObjects());
+    public List<ProjectViewDTO> getAllProjects() {
+        return _projectManager.getProjectObjects()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -48,11 +53,24 @@ public class ProjectDataServiceImpl implements ProjectDataService
      * @return нужный проект
      */
     @Override
-    public Project getProjectByKey(String projectKey) {
+    public ProjectViewDTO getProjectByKey(String projectKey) {
         if(projectKey == null || projectKey.isBlank()) {
             return null;
         }
 
-        return _projectManager.getProjectByCurrentKey(projectKey);
+        Project project = _projectManager.getProjectByCurrentKey(projectKey);
+
+        if(project == null) {
+            return null;
+        }
+
+        return mapToDTO(project);
+    }
+
+    private ProjectViewDTO mapToDTO(Project project) {
+        return new ProjectViewDTO(
+                project.getKey(),
+                project.getName()
+        );
     }
 }
