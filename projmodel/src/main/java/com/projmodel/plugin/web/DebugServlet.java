@@ -1,6 +1,6 @@
 package com.projmodel.plugin.web;
 
-import com.atlassian.jira.project.Project;
+import com.projmodel.plugin.dto.ProjectViewDTO;
 import com.projmodel.plugin.service.IssueDataService;
 import com.projmodel.plugin.service.ProjectDataService;
 
@@ -30,13 +30,13 @@ public class DebugServlet extends HttpServlet {
         resp.setContentType("text/html; charset=UTF-8");
 
         String projectKey = req.getParameter("projectKey");
-        List<Project> projects = projectDataService.getAllProjects();
+        List<ProjectViewDTO> projects = projectDataService.getAllProjects();
 
         resp.getWriter().println("<h1>Debug Jira Data</h1>");
         resp.getWriter().println("<p>Projects count: " + projects.size() + "</p>");
 
         if (projectKey != null && !projectKey.trim().isEmpty()) {
-            Project project = projectDataService.getProjectByKey(projectKey);
+            ProjectViewDTO project = projectDataService.getProjectByKey(projectKey);
 
             if (project == null) {
                 resp.getWriter().println("<p>Project not found: " + projectKey + "</p>");
