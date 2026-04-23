@@ -59,4 +59,11 @@
         <url-pattern>/projmodel/deadline</url-pattern>
     </servlet>
 
+    <servlet name="debug-servlet"
+             key="debug-servlet"
+             class="com.projmodel.plugin.web.DebugServlet">
+        <description>Debug Servlet</description>
+        <url-pattern>/debug</url-pattern>
+    </servlet>
+
 </atlassian-plugin>
