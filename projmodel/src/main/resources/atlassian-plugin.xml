@@ -43,6 +43,13 @@
         <link linkId="projmodel-link">/plugins/servlet/projmodel</link>
     </web-item>
 
+    <!-- Модуль Active Objects для работы с базой данных -->
+    <ao key="ao-module">
+        <description>База данных плагина ProjModel</description>
+        <entity>com.projmodel.plugin.ao.ReminderLogAO</entity>
+        <entity>com.projmodel.plugin.ao.ReportTaskAO</entity>
+    </ao>
+
     <!-- Workload Servlet -->
     <servlet name="projmodel-workload"
              key="projmodel-workload"
@@ -64,6 +71,14 @@
              class="com.projmodel.plugin.web.DebugServlet">
         <description>Debug Servlet</description>
         <url-pattern>/debug</url-pattern>
+    </servlet>
+
+    <!-- Report Servlet -->
+    <servlet name="projmodel-report"
+             key="projmodel-report"
+             class="com.projmodel.plugin.web.ReportServlet">
+        <description>Скачивание отчётов ProjModel</description>
+        <url-pattern>/projmodel/report</url-pattern>
     </servlet>
 
 </atlassian-plugin>
