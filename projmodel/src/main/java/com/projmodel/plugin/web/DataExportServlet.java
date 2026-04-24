@@ -28,11 +28,7 @@ public class DataExportServlet extends HttpServlet {
         resp.setContentType("text/html;charset=UTF-8");
 
         Map<String, Object> context = new HashMap<>();
-        context.put("pluginName", "ProjModel");
-        context.put("pageTitle", "Data Export - экспорт данных");
-        context.put("pageDescription", "Временная страница-заглушка для будущего экспорта данных проекта и отчетов");
-        context.put("status", "MVP / в разработке");
-        context.put("statusMessage", "Здесь будет страница генерации и скачивания экспортов. Пока это рабочая заглушка для навигации и демонстрации будущего сценария.");
+        context.put("pageTitle", "ProjModel Reports");
         context.put("req", req);
 
         templateRenderer.render("/templates/export.vm", context, resp.getWriter());
