@@ -113,6 +113,21 @@ public class WorkloadAnalysisServiceImpl implements WorkloadAnalysisService {
      */
     private String calculateLoadLevel(int totalTasks, int overdueTasks, int tasksDueWithin7Days)
     {
-        return null;
+        //критическая нагрузка: больше 2 просроченных задач или больше 10 задач всего
+        if (overdueTasks > 2 || totalTasks > 10) {
+            return "critical";
+        }
+        //высокая нагрузка: есть просроченные задачи, или больше 3 срочных задач, или всего больше 7 задач
+        else if (overdueTasks > 0 || tasksDueWithin7Days > 3 || totalTasks > 7) {
+            return "high";
+        }
+        //средняя нагрузка: больше 1 задачи с близким дедлайном или всего больше 4 задач
+        else if (tasksDueWithin7Days > 1 || totalTasks > 4) {
+            return "medium";
+        }
+        //низкая нагрузка: все остальные случаи
+        else {
+            return "low";
+        }
     }
 }
