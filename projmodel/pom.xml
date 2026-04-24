@@ -82,6 +82,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.atlassian.activeobjects</groupId>
+            <artifactId>activeobjects-plugin</artifactId>
+            <version>${ao.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <repositories>
@@ -192,7 +199,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-			
+
         </plugins>
     </build>
 
@@ -205,6 +212,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <ao.version>3.2.2</ao.version>
     </properties>
 
 </project>
