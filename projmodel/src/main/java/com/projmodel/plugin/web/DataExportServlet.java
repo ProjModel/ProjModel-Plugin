@@ -1,4 +1,4 @@
-﻿package com.projmodel.plugin.web;
+package com.projmodel.plugin.web;
 
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
