@@ -2,12 +2,11 @@ package com.projmodel.plugin.report;
 
 import com.projmodel.plugin.dto.IssueViewDTO;
 import org.apache.poi.xwpf.usermodel.*;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.element.Cell;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -102,52 +101,100 @@ public class ReportGenerator {
     public static byte[] generatePdfReport(List<IssueViewDTO> issues, String projectKey)
             throws IOException {
 
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            //создаем PDF-документ
-            PdfWriter writer = new PdfWriter(baos);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
+        try (PDDocument document = new PDDocument();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
-            //добавляем заголовок
-            Paragraph title = new Paragraph("Отчёт по проекту " + projectKey)
-                    .setBold()
-                    .setFontSize(16);
-            document.add(title);
+            //создаем страницу
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
 
-            //добавляем дату создания
-            Paragraph date = new Paragraph("Создан: " +
-                    new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new java.util.Date()))
-                    .setFontSize(10);
-            document.add(date);
+            //поток для записи содержимого
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
-            //пустая строка для отступа
-            document.add(new Paragraph(""));
+            //шрифт (встроенный)
+            PDType0Font font = PDType0Font.load(document,
+                    ReportGenerator.class.getResourceAsStream("/fonts/DejaVuSans.ttf"));
+            PDType0Font fontBold = PDType0Font.load(document,
+                    ReportGenerator.class.getResourceAsStream("/fonts/DejaVuSans-Bold.ttf"));
 
-            //создаем таблицу (5 колонок)
-            Table table = new Table(5);
+            float yPosition = page.getMediaBox().getHeight() - 50;
+            float margin = 50;
+            float fontSize = 10;
+            float titleFontSize = 18;
 
-            //заголовки таблицы (жирным шрифтом)
+            //заголовок
+            contentStream.beginText();
+            contentStream.setFont(fontBold, titleFontSize);
+            contentStream.newLineAtOffset(margin + 100, yPosition);
+            contentStream.showText("Отчёт по проекту " + projectKey);
+            contentStream.endText();
+
+            //дата
+            yPosition -= 30;
+            contentStream.beginText();
+            contentStream.setFont(font, fontSize);
+            contentStream.newLineAtOffset(margin, yPosition);
+            contentStream.showText("Создан: " +
+                    new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new java.util.Date()));
+            contentStream.endText();
+
+            //таблица
+            yPosition -= 30;
+            float[] colWidths = {80, 200, 80, 100, 80}; //ширины колонок
             String[] headers = {"Ключ", "Название", "Статус", "Исполнитель", "Дедлайн"};
-            for (String header : headers) {
-                Cell cell = new Cell().add(new Paragraph(header).setBold());
-                table.addCell(cell);
+
+            //заголовки таблицы
+            float xPosition = margin;
+            for (int i = 0; i < headers.length; i++) {
+                contentStream.beginText();
+                contentStream.setFont(fontBold, fontSize);
+                contentStream.newLineAtOffset(xPosition, yPosition);
+                contentStream.showText(headers[i]);
+                contentStream.endText();
+                xPosition += colWidths[i];
             }
 
-            //заполняем таблицу данными задач
+            //данные
+            yPosition -= 20;
             for (IssueViewDTO issue : issues) {
-                table.addCell(new Cell().add(new Paragraph(issue.get_key())));
-                table.addCell(new Cell().add(new Paragraph(issue.get_summary())));
-                table.addCell(new Cell().add(new Paragraph(issue.get_status())));
-                table.addCell(new Cell().add(new Paragraph(issue.getAssignee())));
-                table.addCell(new Cell().add(new Paragraph(
+                //проверяем, нужна ли новая страница
+                if (yPosition < 50) {
+                    contentStream.close();
+                    page = new PDPage(PDRectangle.A4);
+                    document.addPage(page);
+                    contentStream = new PDPageContentStream(document, page);
+                    yPosition = page.getMediaBox().getHeight() - 50;
+                }
+
+                xPosition = margin;
+                String[] rowData = {
+                        issue.get_key(),
+                        issue.get_summary(),
+                        issue.get_status(),
+                        issue.getAssignee(),
                         issue.getDueDate() != null ?
-                                new SimpleDateFormat("dd.MM.yyyy").format(issue.getDueDate()) : "Нет")));
+                                new SimpleDateFormat("dd.MM.yyyy").format(issue.getDueDate()) : "Нет"
+                };
+
+                for (int i = 0; i < rowData.length; i++) {
+                    contentStream.beginText();
+                    contentStream.setFont(font, fontSize);
+                    contentStream.newLineAtOffset(xPosition, yPosition);
+                    //обрезаем длинный текст чтобы не вылезал за колонку
+                    String text = rowData[i] != null && rowData[i].length() > 30
+                            ? rowData[i].substring(0, 27) + "..."
+                            : rowData[i];
+                    contentStream.showText(text);
+                    contentStream.endText();
+                    xPosition += colWidths[i];
+                }
+                yPosition -= 20;
             }
 
-            //добавляем таблицу в документ
-            document.add(table);
-            document.close();
+            contentStream.close();
 
+            //сохраняем документ в массив байтов
+            document.save(baos);
             return baos.toByteArray();
         }
     }
