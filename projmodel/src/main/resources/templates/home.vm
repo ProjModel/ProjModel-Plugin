@@ -26,8 +26,8 @@
             <h2>Reports</h2>
             <p>Экспорт данных проекта и формирование отчётов</p>
             <a href="$req.contextPath/plugins/servlet/projmodel/report-request" class="projmodel-badge-link">
-            <p>Экспорт данных проекта и формирование отчётов</p>
-            <span class="projmodel-badge">Создать отчёт</span>
+                <span class="projmodel-badge">Создать отчёт</span>
+            </a>
         </div>
 
         <div class="projmodel-card">
