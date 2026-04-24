@@ -14,27 +14,20 @@
         <p class="projmodel-version">Version: 1.0.0-demo</p>
     </div>
 
-    <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
-        <div class="projmodel-mvp-badge">
-            $status
-        </div>
-        <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
-            $statusMessage
-        </p>
-
+    #if($workloadData && !$workloadData.isEmpty())
         <!-- Легенда цветов -->
         <div class="workload-legend">
             <div class="legend-item">
                 <div class="legend-color legend-green"></div>
-                <span>Нормальная загрузка (до 80%)</span>
+                <span>Нормальная загрузка</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color legend-yellow"></div>
-                <span>Высокая загрузка (80-100%)</span>
+                <span>Средняя загрузка</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color legend-red"></div>
-                <span>Перегрузка (более 100%)</span>
+                <span>Высокая / Критическая загрузка</span>
             </div>
         </div>
 
@@ -43,82 +36,53 @@
             <table class="workload-table">
                 <thead>
                     <tr>
-                        <th>Участник</th>
-                        <th>Роль</th>
-                        <th>Загрузка</th>
-                        <th>Активных задач</th>
-                        <th>Статус</th>
+                        <th>Исполнитель</th>
+                        <th>Всего задач</th>
+                        <th>Дедлайн ≤ 7 дн.</th>
+                        <th>Просрочено</th>
+                        <th>Без дедлайна</th>
+                        <th>Уровень нагрузки</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Зелёный - до 80% -->
-                    <tr class="workload-low">
-                        <td class="workload-name">А</td>
-                        <td>Тимлид / Системный аналитик</td>
-                        <td>
-                            <div class="workload-bar-wrapper">
-                                <div class="workload-bar workload-bar-green" style="width: 45%;">45%</div>
-                            </div>
-                        </td>
-                        <td>3 задачи</td>
-                        <td><span class="workload-status status-green">Норма</span></td>
-                    </tr>
+                    #foreach($item in $workloadData)
+                        #set($rowClass = "workload-low")
+                        #set($statusClass = "status-green")
+                        #set($statusText = "Низкая")
+                        #if($item.loadLevel == "critical")
+                            #set($rowClass = "workload-high")
+                            #set($statusClass = "status-red")
+                            #set($statusText = "Критическая")
+                        #elseif($item.loadLevel == "high")
+                            #set($rowClass = "workload-high")
+                            #set($statusClass = "status-red")
+                            #set($statusText = "Высокая")
+                        #elseif($item.loadLevel == "medium")
+                            #set($rowClass = "workload-medium")
+                            #set($statusClass = "status-yellow")
+                            #set($statusText = "Средняя")
+                        #end
 
-                    <!-- Жёлтый - 80-100% -->
-                    <tr class="workload-medium">
-                        <td class="workload-name">Ар</td>
-                        <td>Программист внутренней логики</td>
-                        <td>
-                            <div class="workload-bar-wrapper">
-                                <div class="workload-bar workload-bar-yellow" style="width: 82%;">82%</div>
-                            </div>
-                        </td>
-                        <td>5 задач</td>
-                        <td><span class="workload-status status-yellow">Высокая нагрузка</span></td>
-                    </tr>
-
-                    <!-- Красный - более 100% -->
-                    <tr class="workload-high">
-                        <td class="workload-name">И</td>
-                        <td>Тестировщик / Программист</td>
-                        <td>
-                            <div class="workload-bar-wrapper">
-                                <div class="workload-bar workload-bar-red" style="width: 125%;">125%</div>
-                            </div>
-                        </td>
-                        <td>7 задач</td>
-                        <td><span class="workload-status status-red">Перегрузка!</span></td>
-                    </tr>
-
-                    <!-- Зелёный - до 80% -->
-                    <tr class="workload-low">
-                        <td class="workload-name">Д</td>
-                        <td>Frontend-разработчик</td>
-                        <td>
-                            <div class="workload-bar-wrapper">
-                                <div class="workload-bar workload-bar-green" style="width: 28%;">28%</div>
-                            </div>
-                        </td>
-                        <td>2 задачи</td>
-                        <td><span class="workload-status status-green">Норма</span></td>
-                    </tr>
-
-                    <!-- Жёлтый - 80-100% -->
-                    <tr class="workload-medium">
-                        <td class="workload-name">Е</td>
-                        <td>UX/UI Дизайнер</td>
-                        <td>
-                            <div class="workload-bar-wrapper">
-                                <div class="workload-bar workload-bar-yellow" style="width: 94%;">94%</div>
-                            </div>
-                        </td>
-                        <td>4 задачи</td>
-                        <td><span class="workload-status status-yellow">Высокая нагрузка</span></td>
-                    </tr>
+                        <tr class="$rowClass">
+                            <td class="workload-name">$item.assignee</td>
+                            <td>$item.totalTasks</td>
+                            <td>$item.tasksDueWithin7Days</td>
+                            <td>$item.overdueTasks</td>
+                            <td>$item.tasksWithoutDueDate</td>
+                            <td><span class="workload-status $statusClass">$statusText</span></td>
+                        </tr>
+                    #end
                 </tbody>
             </table>
         </div>
-    </div>
+    #else
+        <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
+            <div class="projmodel-mvp-badge">Нет данных</div>
+            <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
+                Для проекта $projectKey нет незавершённых задач или проект не найден.
+            </p>
+        </div>
+    #end
 
     <div class="projmodel-footer">
         ProjModel — умный помощник для Jira
