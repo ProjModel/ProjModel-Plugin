@@ -23,4 +23,11 @@ public interface IssueDataService {
      * @return список незавершенных задач проекта в формате DTO
      */
     List<IssueViewDTO> getOpenIssuesForProject(String projectKey);
+
+    /**
+     * Получить задачу по уникальному ключу (например, "TEST-1")
+     * @param issueKey уникальный ключ задачи
+     * @return задача в формате DTO или null, если не найдена
+     */
+    IssueViewDTO getIssueByKey(String issueKey);
 }
