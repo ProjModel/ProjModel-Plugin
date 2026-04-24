@@ -145,6 +145,44 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     public byte[] generateReportFile(int reportId) {
-        return new byte[0];
+        //получаем запрос на отчёт из БД
+        ReportTaskAO report = getReportById(reportId);
+
+        if (report == null) {
+            throw new IllegalArgumentException("Отчёт не найден: " + reportId);
+        }
+
+        //преобразуем строку ключей в список (ключи хранятся через запятую)
+        List<String> issueKeys = Arrays.asList(report.getIssueKeys().split(","));
+
+        //получаем полные данные задач по их ключам
+        List<IssueViewDTO> issues = new ArrayList<>();
+        for (String key : issueKeys) {
+            IssueViewDTO issue = _issueDataService.getIssueByKey(key.trim());
+            if (issue != null) {
+                issues.add(issue);
+            }
+        }
+
+        try {
+            byte[] fileData;
+
+            //генерируем файл в зависимости от формата
+            if ("WORD".equals(report.getReportFormat())) {
+                fileData = ReportGenerator.generateWordReport(issues, report.getProjectKey());
+            } else {
+                fileData = ReportGenerator.generatePdfReport(issues, report.getProjectKey());
+            }
+
+            //обновляем статус на "сгенерирован"
+            updateReportStatus(reportId, "GENERATED", null);
+
+            return fileData;
+
+        } catch (Exception e) {
+            //в случае ошибки обновляем статус и выбрасываем исключение
+            updateReportStatus(reportId, "ERROR", null);
+            throw new RuntimeException("Ошибка при генерации отчёта: " + e.getMessage(), e);
+        }
     }
 }
