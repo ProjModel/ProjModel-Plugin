@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Сервис по анализу загрузки участников команды на основе незавершенных задач проекта
+ * Сервис по анализу загрузки участников команды на основе незавершенных задач проекта v1
  */
 @Named
 public class WorkloadAnalysisServiceImpl implements WorkloadAnalysisService {
