@@ -73,12 +73,12 @@
         <url-pattern>/debug</url-pattern>
     </servlet>
 
-    <!-- Report Servlet -->
-    <servlet name="projmodel-report"
-             key="projmodel-report"
-             class="com.projmodel.plugin.web.ReportServlet">
-        <description>Скачивание отчётов ProjModel</description>
-        <url-pattern>/projmodel/report</url-pattern>
+    <!-- Report Request Servlet -->
+    <servlet name="projmodel-report-request"
+             key="projmodel-report-request"
+             class="com.projmodel.plugin.web.ReportRequestServlet">
+        <description>Создание и скачивание отчётов ProjModel</description>
+        <url-pattern>/projmodel/report-request</url-pattern>
     </servlet>
 
 </atlassian-plugin>
