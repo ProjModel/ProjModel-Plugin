@@ -1,7 +1,10 @@
 package com.projmodel.plugin.ao;
 
-/**
- * Класс-заготовка, предназначенный для структуризации данных для создания отчетов в ворде и пдф (пока что заготовка)
- */
+import net.java.ao.Entity;
+import net.java.ao.Preload;
+import net.java.ao.schema.NotNull;
+import net.java.ao.schema.StringLength;
+import java.util.Date;
+
 public class ReportTaskAO {
 }
