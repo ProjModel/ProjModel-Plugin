@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Сервис по анализу загрузки участников команды на основе незавершенных задач проекта
  */
+@Named
 public class WorkloadAnalysisServiceImpl implements WorkloadAnalysisService {
 
     /**
