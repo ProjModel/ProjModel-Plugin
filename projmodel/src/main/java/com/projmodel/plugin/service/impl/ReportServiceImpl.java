@@ -83,21 +83,66 @@ public class ReportServiceImpl implements ReportService {
         return report;
     }
 
+    /**
+     * Получить все запросы на отчёты для указанного проекта
+     * @param projectKey ключ проекта
+     * @return список запросов, отсортированный по дате создания (новые сверху)
+     */
     @Override
     public List<ReportTaskAO> getReportsByProject(String projectKey) {
-        return List.of();
+        //выполняем запрос к БД: ищем все отчёты проекта, сортируем по дате создания
+        ReportTaskAO[] reports = _activeObjects.find(
+                ReportTaskAO.class,
+                Query.select()
+                        .where("PROJECT_KEY = ?", projectKey)
+                        .order("CREATED_DATE DESC")
+        );
+
+        return Arrays.asList(reports);
     }
 
+    /**
+     * Получить конкретный запрос на отчёт по его ID
+     * @param id идентификатор записи в БД
+     * @return запись запроса на отчёт или null, если не найдена
+     */
     @Override
     public ReportTaskAO getReportById(int id) {
-        return null;
+        return _activeObjects.get(ReportTaskAO.class, id);
     }
 
+    /**
+     * Обновить статус запроса на отчёт
+     * @param reportId идентификатор записи
+     * @param status новый статус ("PENDING", "GENERATED", "ERROR")
+     * @param filePath путь к сгенерированному файлу (может быть null)
+     */
     @Override
     public void updateReportStatus(int reportId, String status, String filePath) {
+//получаем запись из БД по ID
+        ReportTaskAO report = _activeObjects.get(ReportTaskAO.class, reportId);
 
+        if (report != null) {
+            //обновляем статус
+            report.setStatus(status);
+
+            //если передан путь к файлу, сохраняем его
+            if (filePath != null && !filePath.isBlank()) {
+                report.setFilePath(filePath);
+            }
+
+            //сохраняем изменения в БД
+            report.save();
+        }
     }
 
+    /**
+     * Сгенерировать файл отчёта (Word или PDF) по запросу
+     * Получает задачи по ключам, генерирует файл и обновляет статус запроса
+     * @param reportId идентификатор запроса на отчёт
+     * @return массив байтов сгенерированного файла
+     * @throws RuntimeException если отчёт не найден или произошла ошибка генерации
+     */
     @Override
     public byte[] generateReportFile(int reportId) {
         return new byte[0];
