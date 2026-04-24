@@ -1,1 +1,77 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>$pageTitle</title>
+    <link rel="stylesheet" type="text/css" href="$req.contextPath/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <a href="$req.contextPath/plugins/servlet/projmodel" class="projmodel-back-link">&larr; На главную</a>
+        <h1>$pageTitle</h1>
+        <p class="projmodel-subtitle">$pageDescription</p>
+        <p class="projmodel-version">Version: 1.0.0-demo</p>
+    </div>
+
+    <div class="projmodel-card export-hero">
+        <div class="projmodel-mvp-badge">
+            $status
+        </div>
+        <p class="export-hero-text">
+            $statusMessage
+        </p>
+        <div class="export-chip-row">
+            <span class="export-chip">CSV</span>
+            <span class="export-chip">JSON</span>
+            <span class="export-chip">Excel</span>
+            <span class="export-chip export-chip-muted">PDF позже</span>
+        </div>
+    </div>
+
+    <div class="projmodel-grid export-grid">
+        <div class="projmodel-card">
+            <h2>Что будет экспортироваться</h2>
+            <ul class="export-list">
+                <li>Список задач проекта</li>
+                <li>Статусы, исполнители и дедлайны</li>
+                <li>Сводка по загрузке команды</li>
+                <li>Данные для отчетов и аналитики</li>
+            </ul>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>Планируемый сценарий</h2>
+            <ul class="export-list">
+                <li>Выбрать проект или набор задач</li>
+                <li>Выбрать формат экспорта</li>
+                <li>Сгенерировать файл</li>
+                <li>Скачать результат из Jira</li>
+            </ul>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>Текущий статус</h2>
+            <ul class="export-list">
+                <li>Маршрут страницы подключен</li>
+                <li>Заглушка доступна из главного меню плагина</li>
+                <li>UI для будущего экспорта подготовлен</li>
+                <li>Бизнес-логика выгрузки еще не реализована</li>
+            </ul>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>Следующий шаг разработки</h2>
+            <p class="export-note">
+                Следующим этапом сюда можно подключить выбор проекта, фильтры по задачам и отдельный endpoint для формирования файла.
+            </p>
+            <span class="projmodel-badge">Готово для дальнейшей реализации</span>
+        </div>
+    </div>
+
+    <div class="projmodel-footer">
+        ProjModel - smart export workspace for Jira
+    </div>
+</div>
+</body>
+</html>
