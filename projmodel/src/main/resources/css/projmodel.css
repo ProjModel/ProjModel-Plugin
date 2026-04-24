@@ -1,4 +1,4 @@
-body {
+﻿body {
     font-family: Arial, sans-serif;
     background: #f4f5f7;
     color: #172b4d;
@@ -70,7 +70,7 @@ body {
     text-align: center;
 }
 
-/* Дополнительные стили для страниц MVP */
+/* Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СЃС‚РёР»Рё РґР»СЏ СЃС‚СЂР°РЅРёС† MVP */
 .projmodel-back-link {
     display: inline-block;
     margin-bottom: 20px;
@@ -151,7 +151,7 @@ body {
     transition: 0.2s;
 }
 
-/* Стили для страницы Deadline Analysis */
+/* РЎС‚РёР»Рё РґР»СЏ СЃС‚СЂР°РЅРёС†С‹ Deadline Analysis */
 .deadline-stats {
     display: flex;
     justify-content: center;
@@ -230,7 +230,7 @@ body {
 .risk-badge.medium { background: #ff991f; color: white; }
 .risk-badge.low { background: #36b37e; color: white; }
 
-/* Стили для страницы Workload */
+/* РЎС‚РёР»Рё РґР»СЏ СЃС‚СЂР°РЅРёС†С‹ Workload */
 .workload-legend {
     display: flex;
     justify-content: center;
@@ -289,7 +289,7 @@ body {
     color: #172b4d;
 }
 
-/* Цвета строк в зависимости от загрузки */
+/* Р¦РІРµС‚Р° СЃС‚СЂРѕРє РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ Р·Р°РіСЂСѓР·РєРё */
 .workload-low {
     background-color: #e3fcef;
     border-left: 4px solid #36b37e;
@@ -305,7 +305,7 @@ body {
     border-left: 4px solid #de350b;
 }
 
-/* Прогресс-бар */
+/* РџСЂРѕРіСЂРµСЃСЃ-Р±Р°СЂ */
 .workload-bar-wrapper {
     background: #ebecf0;
     border-radius: 20px;
@@ -328,7 +328,7 @@ body {
 .workload-bar-yellow { background: #ff991f; }
 .workload-bar-red { background: #de350b; }
 
-/* Статусы */
+/* РЎС‚Р°С‚СѓСЃС‹ */
 .workload-status {
     display: inline-block;
     padding: 4px 12px;
@@ -350,4 +350,56 @@ body {
 .status-red {
     background: #ffebe6;
     color: #bf2600;
+}
+/* Styles for Data Export page */
+.export-hero {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.export-hero-text {
+    font-size: 18px;
+    margin: 24px auto;
+    max-width: 760px;
+    color: #5e6c84;
+}
+
+.export-grid {
+    align-items: stretch;
+}
+
+.export-list {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.7;
+    color: #344563;
+}
+
+.export-chip-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.export-chip {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #deebff;
+    color: #0747a6;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.export-chip-muted {
+    background: #ebecf0;
+    color: #5e6c84;
+}
+
+.export-note {
+    margin: 0 0 16px 0;
+    color: #344563;
+    line-height: 1.6;
 }
