@@ -42,9 +42,45 @@ public class ReportServiceImpl implements ReportService {
         _issueDataService = issueDataService;
     }
 
+    /**
+     * Создать запрос на генерацию отчёта и сохранить его в БД
+     * @param projectKey ключ проекта, для которого создаётся отчёт
+     * @param issueKeys список ключей задач для включения в отчёт
+     * @param format формат отчёта ("WORD" или "PDF")
+     * @return созданная запись в БД со статусом PENDING
+     * @throws IllegalArgumentException если входные данные некорректны
+     */
     @Override
     public ReportTaskAO createReportRequest(String projectKey, List<String> issueKeys, String format) {
-        return null;
+        //валидация входных данных
+        if (projectKey == null || projectKey.isBlank()) {
+            throw new IllegalArgumentException("Ключ проекта не может быть пустым");
+        }
+        if (issueKeys == null || issueKeys.isEmpty()) {
+            throw new IllegalArgumentException("Список задач не может быть пустым");
+        }
+        if (format == null || (!format.equals("WORD") && !format.equals("PDF"))) {
+            throw new IllegalArgumentException("Формат должен быть WORD или PDF");
+        }
+
+        //создаем новую запись в БД
+        ReportTaskAO report = _activeObjects.create(ReportTaskAO.class);
+
+        //заполняем данные запроса
+        report.setProjectKey(projectKey);
+
+        //сохраняем ключи задач через запятую для удобства хранения
+        report.setIssueKeys(String.join(",", issueKeys));
+
+        report.setReportFormat(format);
+        report.setCreatedDate(new Date());
+        report.setStatus("PENDING");  //начальный статус - ожидает генерации
+        report.setFilePath(null);     //файл пока не сгенерирован
+
+        //сохраняем запись в БД
+        report.save();
+
+        return report;
     }
 
     @Override
