@@ -24,4 +24,18 @@ public class WorkloadViewDTO {
     public int getOverdueTasks() { return overdueTasks; }
     public int getTasksWithoutDueDate() { return tasksWithoutDueDate; }
     public String getLoadLevel() { return loadLevel; }
+
+    //Для шкалы
+    public int getLoadPercent()
+    {
+        //условная шкала
+        switch (loadLevel)
+        {
+            case "low": return 40;
+            case "medium": return 70;
+            case "high": return 90;
+            case "critical": return 110;
+            default: return 0;
+        }
+    }
 }
