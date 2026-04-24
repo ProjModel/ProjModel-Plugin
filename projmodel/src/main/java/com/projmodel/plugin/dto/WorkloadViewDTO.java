@@ -17,4 +17,11 @@ public class WorkloadViewDTO {
         this.tasksWithoutDueDate = tasksWithoutDueDate;
         this.loadLevel = loadLevel;
     }
+
+    public String getAssignee() { return assignee; }
+    public int getTotalTasks() { return totalTasks; }
+    public int getTasksDueWithin7Days() { return tasksDueWithin7Days; }
+    public int getOverdueTasks() { return overdueTasks; }
+    public int getTasksWithoutDueDate() { return tasksWithoutDueDate; }
+    public String getLoadLevel() { return loadLevel; }
 }
