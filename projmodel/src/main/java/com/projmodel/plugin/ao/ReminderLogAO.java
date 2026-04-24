@@ -1,4 +1,10 @@
 package com.projmodel.plugin.ao;
 
-public interface ReminderLogAO {
+import net.java.ao.Entity;
+import net.java.ao.Preload;
+import net.java.ao.schema.NotNull;
+import net.java.ao.schema.StringLength;
+import java.util.Date;
+
+public interface ReminderLogAO extends Entity{
 }
