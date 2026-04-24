@@ -1,4 +1,8 @@
 package com.projmodel.plugin.service;
 
-public interface  WorkloadAnalysisService {
+import com.projmodel.plugin.dto.WorkloadViewDTO;
+import java.util.List;
+
+public interface WorkloadAnalysisService {
+    List<WorkloadViewDTO> analyzeWorkload(String projectKey);
 }
