@@ -90,4 +90,65 @@ public class ReportGenerator {
         run.setBold(bold);
         run.setFontSize(10);
     }
+
+    /**
+     * Сгенерировать PDF-отчёт по списку задач
+     * Создаёт PDF-документ с заголовком, датой и таблицей задач
+     * @param issues список задач для включения в отчёт
+     * @param projectKey ключ проекта
+     * @return массив байтов готового PDF-документа
+     * @throws IOException при ошибке создания файла
+     */
+    public static byte[] generatePdfReport(List<IssueViewDTO> issues, String projectKey)
+            throws IOException {
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            //создаем PDF-документ
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            //добавляем заголовок
+            Paragraph title = new Paragraph("Отчёт по проекту " + projectKey)
+                    .setBold()
+                    .setFontSize(16);
+            document.add(title);
+
+            //добавляем дату создания
+            Paragraph date = new Paragraph("Создан: " +
+                    new SimpleDateFormat("dd.MM.yyyy HH:mm").format(new java.util.Date()))
+                    .setFontSize(10);
+            document.add(date);
+
+            //пустая строка для отступа
+            document.add(new Paragraph(""));
+
+            //создаем таблицу (5 колонок)
+            Table table = new Table(5);
+
+            //заголовки таблицы (жирным шрифтом)
+            String[] headers = {"Ключ", "Название", "Статус", "Исполнитель", "Дедлайн"};
+            for (String header : headers) {
+                Cell cell = new Cell().add(new Paragraph(header).setBold());
+                table.addCell(cell);
+            }
+
+            //заполняем таблицу данными задач
+            for (IssueViewDTO issue : issues) {
+                table.addCell(new Cell().add(new Paragraph(issue.get_key())));
+                table.addCell(new Cell().add(new Paragraph(issue.get_summary())));
+                table.addCell(new Cell().add(new Paragraph(issue.get_status())));
+                table.addCell(new Cell().add(new Paragraph(issue.getAssignee())));
+                table.addCell(new Cell().add(new Paragraph(
+                        issue.getDueDate() != null ?
+                                new SimpleDateFormat("dd.MM.yyyy").format(issue.getDueDate()) : "Нет")));
+            }
+
+            //добавляем таблицу в документ
+            document.add(table);
+            document.close();
+
+            return baos.toByteArray();
+        }
+    }
 }
