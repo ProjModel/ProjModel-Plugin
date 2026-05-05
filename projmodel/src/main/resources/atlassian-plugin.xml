@@ -1,4 +1,4 @@
-<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+﻿<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
     <plugin-info>
         <description>${project.description}</description>
         <version>${project.version}</version>
@@ -57,6 +57,13 @@
              class="com.projmodel.plugin.web.DeadlineServlet">
         <description>ProjModel deadline analysis page</description>
         <url-pattern>/projmodel/deadline</url-pattern>
+    </servlet>
+
+    <servlet name="projmodel-export"
+             key="projmodel-export"
+             class="com.projmodel.plugin.web.DataExportServlet">
+        <description>ProjModel data export page</description>
+        <url-pattern>/projmodel/export</url-pattern>
     </servlet>
 
     <servlet name="debug-servlet"
