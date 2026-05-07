@@ -172,12 +172,12 @@
                         </Export-Package>
 
                         <Import-Package>
+                            com.atlassian.*,
+                            javax.inject,
                             javax.servlet;version="[3.1,5)",
                             javax.servlet.http;version="[3.1,5)",
                             javax.servlet.descriptor;version="[3.1,5)",
-                            org.springframework.osgi.*;resolution:="optional",
-                            org.eclipse.gemini.blueprint.*;resolution:="optional",
-                            *
+                            *;resolution:="optional"
                         </Import-Package>
 
                         <Spring-Context>*</Spring-Context>

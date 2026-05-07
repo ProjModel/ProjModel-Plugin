@@ -12,6 +12,8 @@ import com.projmodel.plugin.service.IssueDataService;
 import javax.inject.Inject;
 import javax.inject.Named;
 import com.atlassian.query.Query;
+import com.projmodel.plugin.service.VisibilityService;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,12 +31,18 @@ public class IssueDataServiceImpl implements IssueDataService {
     private final SearchService _searchService;
 
     /**
+     * Сервис для фильтрации задач по области видимости (по ролям)
+     */
+    private final VisibilityService _visibilityService;
+
+    /**
      * Конструктор сервиса
      * @param service сервис для выполнения JQL-запросов
      */
     @Inject
-    public IssueDataServiceImpl(@ComponentImport SearchService service) {
+    public IssueDataServiceImpl(@ComponentImport SearchService service, VisibilityService visibilityService) {
         _searchService = service;
+        _visibilityService = visibilityService;
     }
 
     /**
@@ -45,7 +53,7 @@ public class IssueDataServiceImpl implements IssueDataService {
     @Override
     public List<IssueViewDTO> getIssuesForProject(String projectKey) {
         String jql = "project = \"" + projectKey + "\" ORDER BY created DESC";
-        List<Issue> issues = searchIssuesByJql(jql);
+        List<Issue> issues = searchIssuesByJql(projectKey, jql);
 
         return issues.stream()
                 .map(this::mapToDTO)
@@ -60,7 +68,7 @@ public class IssueDataServiceImpl implements IssueDataService {
     @Override
     public List<IssueViewDTO> getOpenIssuesForProject(String projectKey) {
         String jql = "project = \"" + projectKey + "\" AND resolution = Unresolved ORDER BY due ASC";
-        List<Issue> issues = searchIssuesByJql(jql);
+        List<Issue> issues = searchIssuesByJql(projectKey, jql);
 
         return issues.stream()
                 .map(this::mapToDTO)
@@ -72,7 +80,7 @@ public class IssueDataServiceImpl implements IssueDataService {
      * @param jql строка jql
      * @return список незавершенных задач
      */
-    private List<Issue> searchIssuesByJql(String jql) {
+    private List<Issue> searchIssuesByJql(String projectKey, String jql) {
         try {
             //получаем юзера
             ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
@@ -90,7 +98,7 @@ public class IssueDataServiceImpl implements IssueDataService {
             //сортировка по только незавершенным задачам
             SearchResults<Issue> results = _searchService.search(user, q, com.atlassian.jira.web.bean.PagerFilter.getUnlimitedFilter());
 
-            return results.getResults();
+            return _visibilityService.filterIssues(projectKey, results.getResults(), user);
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
@@ -130,14 +138,44 @@ public class IssueDataServiceImpl implements IssueDataService {
 
         //формируем JQL-запрос для поиска задачи по ключу
         String jql = "issue = \"" + issueKey + "\"";
-        List<Issue> issues = searchIssuesByJql(jql);
 
-        //если задачи нет в результатах, возвращаем null
-        if (issues.isEmpty()) {
+        try {
+            ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+
+            if (user == null) {
+                return null;
+            }
+
+            SearchService.ParseResult parseResult = _searchService.parseQuery(user, jql);
+
+            if (!parseResult.isValid()) {
+                return null;
+            }
+
+            Query query = parseResult.getQuery();
+
+            SearchResults<Issue> results = _searchService.search(
+                    user,
+                    query,
+                    com.atlassian.jira.web.bean.PagerFilter.getUnlimitedFilter()
+            );
+
+            if (results.getResults().isEmpty()) {
+                return null;
+            }
+
+            Issue issue = results.getResults().get(0);
+            String projectKey = issue.getProjectObject().getKey();
+
+            if (!_visibilityService.canUserSeeIssue(projectKey, issue, user)) {
+                return null;
+            }
+
+            return mapToDTO(issue);
+
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
-
-        //конвертируем найденную задачу в DTO
-        return mapToDTO(issues.get(0));
     }
 }
