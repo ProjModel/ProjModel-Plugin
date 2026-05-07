@@ -18,13 +18,13 @@ public interface ReportTaskAO extends Entity {
     String getIssueKeys();  // JSON-массив ключей задач
     void setIssueKeys(String issueKeys);
 
-    String getReportFormat();  // "WORD" или "PDF"
+    String getReportFormat();  // WORD или PDF
     void setReportFormat(String reportFormat);
 
     Date getCreatedDate();
     void setCreatedDate(Date createdDate);
 
-    String getStatus();  // "PENDING", "GENERATED", "ERROR"
+    String getStatus();  // PENDING, GENERATED, ERROR
     void setStatus(String status);
 
     @StringLength(StringLength.UNLIMITED)
