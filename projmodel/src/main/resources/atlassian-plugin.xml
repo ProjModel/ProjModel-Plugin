@@ -73,6 +73,13 @@
         <url-pattern>/debug</url-pattern>
     </servlet>
 
+    <servlet name="visibility-settings-servlet"
+             key="visibility-settings-servlet"
+             class="com.projmodel.plugin.web.VisibilitySettingsServlet">
+        <description>ProjModel Visibility Settings</description>
+        <url-pattern>/projmodel/visibility-settings</url-pattern>
+    </servlet>
+
     <!-- Report Request Servlet -->
     <servlet name="projmodel-report-request"
              key="projmodel-report-request"

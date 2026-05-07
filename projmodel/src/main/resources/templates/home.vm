@@ -52,6 +52,14 @@
                 <span class="projmodel-badge">перейти </span>
             </a>
         </div>
+
+        <div class="projmodel-card">
+            <h2>Visibility Settings</h2>
+            <p>Настройка видимости задач по ролям участников проекта</p>
+            <a href="$req.contextPath/plugins/servlet/projmodel/visibility-settings" class="projmodel-badge-link">
+                <span class="projmodel-badge">перейти</span>
+            </a>
+        </div>
     </div>
 
     <div class="projmodel-footer">
