@@ -138,14 +138,44 @@ public class IssueDataServiceImpl implements IssueDataService {
 
         //формируем JQL-запрос для поиска задачи по ключу
         String jql = "issue = \"" + issueKey + "\"";
-        List<Issue> issues = searchIssuesByJql("", jql); //тут пока чисто заглушка, думаю еще шо делать
 
-        //если задачи нет в результатах, возвращаем null
-        if (issues.isEmpty()) {
+        try {
+            ApplicationUser user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+
+            if (user == null) {
+                return null;
+            }
+
+            SearchService.ParseResult parseResult = _searchService.parseQuery(user, jql);
+
+            if (!parseResult.isValid()) {
+                return null;
+            }
+
+            Query query = parseResult.getQuery();
+
+            SearchResults<Issue> results = _searchService.search(
+                    user,
+                    query,
+                    com.atlassian.jira.web.bean.PagerFilter.getUnlimitedFilter()
+            );
+
+            if (results.getResults().isEmpty()) {
+                return null;
+            }
+
+            Issue issue = results.getResults().get(0);
+            String projectKey = issue.getProjectObject().getKey();
+
+            if (!_visibilityService.canUserSeeIssue(projectKey, issue, user)) {
+                return null;
+            }
+
+            return mapToDTO(issue);
+
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
-
-        //конвертируем найденную задачу в DTO
-        return mapToDTO(issues.get(0));
     }
 }
