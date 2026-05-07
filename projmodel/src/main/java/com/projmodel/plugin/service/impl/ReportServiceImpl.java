@@ -8,6 +8,8 @@ import com.projmodel.plugin.report.ReportGenerator;
 import com.projmodel.plugin.service.IssueDataService;
 import com.projmodel.plugin.service.ReportService;
 import net.java.ao.Query;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,21 +65,16 @@ public class ReportServiceImpl implements ReportService {
             throw new IllegalArgumentException("Формат должен быть WORD или PDF");
         }
 
-        //создаем новую запись в БД
-        ReportTaskAO report = _activeObjects.create(ReportTaskAO.class);
+        // Пробуем через прямое создание с параметрами
+        Map<String, Object> params = new HashMap<>();
+        params.put("PROJECT_KEY", projectKey);
+        params.put("ISSUE_KEYS", String.join(",", issueKeys));
+        params.put("REPORT_FORMAT", format);
+        params.put("CREATED_DATE", new Date());
+        params.put("STATUS", "PENDING");
+        params.put("FILE_PATH", null);
 
-        //заполняем данные запроса
-        report.setProjectKey(projectKey);
-
-        //сохраняем ключи задач через запятую для удобства хранения
-        report.setIssueKeys(String.join(",", issueKeys));
-
-        report.setReportFormat(format);
-        report.setCreatedDate(new Date());
-        report.setStatus("PENDING");  //начальный статус - ожидает генерации
-        report.setFilePath(null);     //файл пока не сгенерирован
-
-        //сохраняем запись в БД
+        ReportTaskAO report = _activeObjects.create(ReportTaskAO.class, params);
         report.save();
 
         return report;
@@ -137,7 +134,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     /**
-     * Сгенерировать файл отчёта (Word или PDF) по запросу
+     * Сгенерировать файл отчёта (HTML или текст) по запросу
      * Получает задачи по ключам, генерирует файл и обновляет статус запроса
      * @param reportId идентификатор запроса на отчёт
      * @return массив байтов сгенерированного файла
@@ -169,9 +166,11 @@ public class ReportServiceImpl implements ReportService {
 
             //генерируем файл в зависимости от формата
             if ("WORD".equals(report.getReportFormat())) {
-                fileData = ReportGenerator.generateWordReport(issues, report.getProjectKey());
+                // HTML открывается в Word как обычный документ
+                fileData = ReportGenerator.generateHtmlReport(issues, report.getProjectKey());
             } else {
-                fileData = ReportGenerator.generatePdfReport(issues, report.getProjectKey());
+                // Текстовый отчёт (можно сохранить как PDF через браузер)
+                fileData = ReportGenerator.generateTextReport(issues, report.getProjectKey());
             }
 
             //обновляем статус на "сгенерирован"

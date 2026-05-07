@@ -14,6 +14,7 @@
     </div>
 
     <div class="projmodel-card">
+        <!-- ВАЖНО: правильный action -->
         <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/report-request" style="margin-bottom: 20px;">
             <label for="projectKey">Выберите проект:</label>
             <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 8px; margin: 10px 0; width: 100%; max-width: 400px;">
@@ -27,13 +28,14 @@
         </form>
 
         #if($projectKey)
+            <!-- ВАЖНО: правильный action -->
             <form method="POST" action="$req.contextPath/plugins/servlet/projmodel/report-request">
                 <input type="hidden" name="projectKey" value="$projectKey">
 
                 <label for="format">Формат отчёта:</label>
                 <select name="format" id="format" style="padding: 8px; margin: 10px 0; width: 100%; max-width: 400px;">
-                    <option value="WORD">Word (DOCX)</option>
-                    <option value="PDF">PDF</option>
+                    <option value="WORD">Word (HTML)</option>
+                    <option value="PDF">Текстовый (TXT)</option>
                 </select>
 
                 <h3>Выберите задачи для отчёта:</h3>
