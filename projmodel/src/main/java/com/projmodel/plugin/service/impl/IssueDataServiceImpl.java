@@ -115,4 +115,29 @@ public class IssueDataServiceImpl implements IssueDataService {
 
         return new IssueViewDTO(key, summary, status, assignee, dueDate);
     }
+
+    /**
+     * Получить задачу по уникальному ключу (например, "TEST-1")
+     * @param issueKey уникальный ключ задачи
+     * @return задача в формате DTO или null, если не найдена
+     */
+    @Override
+    public IssueViewDTO getIssueByKey(String issueKey) {
+        //проверяем, что ключ не пустой
+        if (issueKey == null || issueKey.isBlank()) {
+            return null;
+        }
+
+        //формируем JQL-запрос для поиска задачи по ключу
+        String jql = "issue = \"" + issueKey + "\"";
+        List<Issue> issues = searchIssuesByJql(jql);
+
+        //если задачи нет в результатах, возвращаем null
+        if (issues.isEmpty()) {
+            return null;
+        }
+
+        //конвертируем найденную задачу в DTO
+        return mapToDTO(issues.get(0));
+    }
 }

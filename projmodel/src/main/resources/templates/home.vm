@@ -24,9 +24,9 @@
 
         <div class="projmodel-card">
             <h2>Reports</h2>
-            <p>Экспорт данных проекта и формирование отчетов</p>
-            <a href="$req.contextPath/plugins/servlet/projmodel/export" class="projmodel-badge-link">
-                <span class="projmodel-badge">перейти</span>
+            <p>Экспорт данных проекта и формирование отчётов</p>
+            <a href="$req.contextPath/plugins/servlet/projmodel/report-request" class="projmodel-badge-link">
+                <span class="projmodel-badge">Создать отчёт</span>
             </a>
         </div>
 
@@ -34,7 +34,7 @@
             <h2>Workload</h2>
             <p>Отслеживание загрузки участников команды</p>
             <a href="$req.contextPath/plugins/servlet/projmodel/workload" class="projmodel-badge-link">
-                <span class="projmodel-badge">перейти</span>
+                <span class="projmodel-badge">перейти </span>
             </a>
         </div>
 
@@ -44,12 +44,12 @@
             <span class="projmodel-badge">Передано в разработку</span>
         </div>
 
-        <!-- страница дебаг для тестов и проверки все ли работает -->
+        <!-- страница дебаг для тестов и проверки все ли работает (debug servlet можно менять как раз для проверок, страничка встроена)) -->
         <div class="projmodel-card">
             <h2>DEBUG FOR DEV</h2>
             <p>Временная вкладка с переходом на DebugServlet для отображений различных компонентов системы</p>
             <a href="$req.contextPath/plugins/servlet/debug" class="projmodel-badge-link">
-                <span class="projmodel-badge">перейти</span>
+                <span class="projmodel-badge">перейти </span>
             </a>
         </div>
     </div>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание отчёта</title>
+    <link rel="stylesheet" type="text/css" href="$req.contextPath/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <a href="$req.contextPath/plugins/servlet/projmodel" class="projmodel-back-link">← На главную</a>
+        <h1>Создание отчёта</h1>
+        <p class="projmodel-subtitle">Выберите проект, формат и задачи для экспорта</p>
+    </div>
+
+    <div class="projmodel-card">
+        <!-- ВАЖНО: правильный action -->
+        <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/report-request" style="margin-bottom: 20px;">
+            <label for="projectKey">Выберите проект:</label>
+            <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 8px; margin: 10px 0; width: 100%; max-width: 400px;">
+                <option value="">-- Выберите проект --</option>
+                #foreach($project in $projects)
+                    <option value="$project.getKey()" #if($projectKey == $project.getKey())selected#end>
+                        $project.getKey() - $project.getName()
+                    </option>
+                #end
+            </select>
+        </form>
+
+        #if($projectKey)
+            <!-- ВАЖНО: правильный action -->
+            <form method="POST" action="$req.contextPath/plugins/servlet/projmodel/report-request">
+                <input type="hidden" name="projectKey" value="$projectKey">
+
+                <label for="format">Формат отчёта:</label>
+                <select name="format" id="format" style="padding: 8px; margin: 10px 0; width: 100%; max-width: 400px;">
+                    <option value="WORD">Word (HTML)</option>
+                    <option value="PDF">Текстовый (TXT)</option>
+                </select>
+
+                <h3>Выберите задачи для отчёта:</h3>
+                #if($issues && !$issues.isEmpty())
+                    <div style="margin: 15px 0; max-height: 400px; overflow-y: auto;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            <input type="checkbox" onclick="toggleAll(this)" style="margin-right: 8px;">
+                            <strong>Выбрать все</strong>
+                        </label>
+                        #foreach($issue in $issues)
+                            <label style="display: block; margin-bottom: 8px; padding: 8px; background: #f4f5f7; border-radius: 4px;">
+                                <input type="checkbox" name="issues" value="$issue.get_key()" style="margin-right: 8px;">
+                                <strong>$issue.get_key()</strong> - $issue.get_summary()
+                                <span style="color: #5e6c84; margin-left: 10px;">[$issue.get_status()]</span>
+                                <span style="color: #5e6c84; margin-left: 10px;">$issue.getAssignee()</span>
+                            </label>
+                        #end
+                    </div>
+                #else
+                    <p style="color: #5e6c84;">В этом проекте нет задач</p>
+                #end
+
+                #if($issues && !$issues.isEmpty())
+                    <button type="submit" style="padding: 12px 30px; background: #0052cc; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 20px;">
+                        Сгенерировать отчёт
+                    </button>
+                #end
+            </form>
+        #end
+    </div>
+
+    <div class="projmodel-footer">
+        ProjModel — умный помощник для Jira
+    </div>
+</div>
+
+<script>
+function toggleAll(source) {
+    var checkboxes = document.getElementsByName('issues');
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+</body>
+</html>
