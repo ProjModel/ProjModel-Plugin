@@ -5,8 +5,10 @@ import com.projmodel.plugin.service.VisibilityAuditService;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import javax.inject.Named;
 import java.util.Date;
 
+@Named
 public class VisibilityAuditServiceImpl implements VisibilityAuditService {
 
     private static final Logger log = LoggerFactory.getLogger(VisibilityAuditServiceImpl.class);

@@ -9,9 +9,11 @@ import com.projmodel.plugin.service.VisibilityAuditService;
 import com.projmodel.plugin.service.VisibilityService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Named
 public class VisibilityServiceImpl implements VisibilityService {
 
 
