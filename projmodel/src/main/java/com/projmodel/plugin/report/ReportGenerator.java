@@ -23,7 +23,7 @@ public class ReportGenerator {
         html.append("<!DOCTYPE html>\n");
         html.append("<html lang=\"ru\">\n");
         html.append("<head>\n");
-        html.append("<meta charset=\"UTF-8\">\n");
+        html.append("<meta charset=\"windows-1251\">\n");
         html.append("<title>Отчёт по проекту ").append(escapeHtml(projectKey)).append("</title>\n");
         html.append("<style>\n");
         html.append("  body { font-family: Arial, sans-serif; margin: 40px; color: #333; }\n");
