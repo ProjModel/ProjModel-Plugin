@@ -7,10 +7,10 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.projmodel.plugin.ao.TemporaryAccessAO;
 import com.projmodel.plugin.ao.VisibilityRuleAO;
-import com.projmodel.plugin.dto.TemporaryAccessDTO;
 import com.projmodel.plugin.dto.VisibilityRuleDTO;
 import com.projmodel.plugin.service.VisibilityAuditService;
 import com.projmodel.plugin.service.VisibilityService;
+import net.java.ao.DBParam;
 import net.java.ao.Query;
 
 import javax.inject.Inject;
@@ -32,9 +32,6 @@ public class VisibilityServiceImpl implements VisibilityService {
 
         _ao = ao;
         _auditService = auditService;
-
-        // MVP-правила
-        createDefaultRulesIfNeeded();
     }
 
     // ----- override methods from interface ----- //
@@ -111,6 +108,9 @@ public class VisibilityServiceImpl implements VisibilityService {
 
     @Override
     public List<VisibilityRuleDTO> getRulesForProject(String projectKey) {
+
+        createDefaultRulesIfNeeded();
+
         if(projectKey == null || projectKey.isBlank()) {
             return Collections.emptyList();
         }
@@ -253,11 +253,13 @@ public class VisibilityServiceImpl implements VisibilityService {
     }
 
     private void saveDefaultRule(String projectKey, String roleName, List<String> labels) {
+
+        String labelsStr = labels.toString();
         _ao.executeInTransaction(() -> {
-            VisibilityRuleAO ruleAO = _ao.create(VisibilityRuleAO.class);
-            ruleAO.setProjectKey(projectKey);
-            ruleAO.setRoleName(roleName);
-            ruleAO.setAllowedLabels(String.join(",", labels));
+            VisibilityRuleAO ruleAO = _ao.create(VisibilityRuleAO.class,
+                    new DBParam("PROJECT_KEY", projectKey),
+                    new DBParam("ROLE_NAME", roleName),
+                    new DBParam("ALLOWED_LABELS", labelsStr));
             ruleAO.setEnabled(true);
             ruleAO.save();
 

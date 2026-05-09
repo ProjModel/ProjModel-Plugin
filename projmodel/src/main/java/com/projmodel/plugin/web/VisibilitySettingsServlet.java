@@ -7,6 +7,7 @@ import com.projmodel.plugin.service.ProjectDataService;
 import com.projmodel.plugin.service.VisibilityService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,15 +16,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Named
 public class VisibilitySettingsServlet extends HttpServlet {
 
     private final VisibilityService _visibilityService;
-    private final ProjectDataService _projectDataService;
 
     @Inject
-    public VisibilitySettingsServlet(VisibilityService visibilityService,ProjectDataService projectDataService) {
+    public VisibilitySettingsServlet(VisibilityService visibilityService) {
         _visibilityService = visibilityService;
-        _projectDataService = projectDataService;
     }
 
     @Override
@@ -105,6 +105,11 @@ public class VisibilitySettingsServlet extends HttpServlet {
         if ("saveRule".equals(action)) {
             String roleName = req.getParameter("roleName");
             String labelsRaw = req.getParameter("labels");
+
+            if (labelsRaw == null) {
+                labelsRaw = "";
+            }
+
             boolean enabled = req.getParameter("enabled") != null;
 
             List<String> labels = Arrays.stream(labelsRaw.split(","))
