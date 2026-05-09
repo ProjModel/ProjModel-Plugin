@@ -32,6 +32,12 @@ public class VisibilitySettingsServlet extends HttpServlet {
 
         String projectKey = req.getParameter("projectKey");
 
+        String enabledParam = req.getParameter("enabled");
+
+        if (enabledParam != null) {
+            _visibilityService.setEnabled(Boolean.parseBoolean(enabledParam)); //чтоб страница обновлялось и правильно показывала 
+        }
+
         resp.getWriter().println("<h1>ProjModel Visibility Settings</h1>");
         resp.getWriter().println("<p>Фильтр сейчас: <b>" +
                 (_visibilityService.isEnabled() ? "ВКЛЮЧЕН" : "ВЫКЛЮЧЕН") +
