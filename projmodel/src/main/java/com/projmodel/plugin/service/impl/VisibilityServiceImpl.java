@@ -1,12 +1,17 @@
 package com.projmodel.plugin.service.impl;
 
+import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.label.Label;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
+import com.projmodel.plugin.ao.TemporaryAccessAO;
+import com.projmodel.plugin.ao.VisibilityRuleAO;
 import com.projmodel.plugin.dto.TemporaryAccessDTO;
 import com.projmodel.plugin.dto.VisibilityRuleDTO;
 import com.projmodel.plugin.service.VisibilityAuditService;
 import com.projmodel.plugin.service.VisibilityService;
+import net.java.ao.Query;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,22 +21,20 @@ import java.util.stream.Collectors;
 @Named
 public class VisibilityServiceImpl implements VisibilityService {
 
+    private final ActiveObjects _ao;
 
     private final VisibilityAuditService _auditService;
 
     private boolean _enabled = true;
 
-    private final List<VisibilityRuleDTO> _rules = new ArrayList<>();
-    private final List<TemporaryAccessDTO> _temporaryAccesses = new ArrayList<>();
-
     @Inject
-    public VisibilityServiceImpl(VisibilityAuditService auditService) {
+    public VisibilityServiceImpl(@ComponentImport ActiveObjects ao, VisibilityAuditService auditService) {
+
+        _ao = ao;
         _auditService = auditService;
 
-        // MVP-правила. Потом перенесём в Active Objects.
-        _rules.add(new VisibilityRuleDTO("TEST", "frontend", Arrays.asList("frontend", "ui"), true));
-        _rules.add(new VisibilityRuleDTO("TEST", "backend", Arrays.asList("backend", "api"), true));
-        _rules.add(new VisibilityRuleDTO("TEST", "tester", Arrays.asList("test", "qa"), true));
+        // MVP-правила
+        createDefaultRulesIfNeeded();
     }
 
     // ----- override methods from interface ----- //
@@ -71,6 +74,10 @@ public class VisibilityServiceImpl implements VisibilityService {
             return false;
         }
 
+        if(!_enabled) {
+            return true;
+        }
+
         if (isTeamLead(user)) {
             return true;
         }
@@ -91,29 +98,65 @@ public class VisibilityServiceImpl implements VisibilityService {
         }
 
         VisibilityRuleDTO rule = ruleOptional.get();
-        Set<String> labels = issue.getLabels().stream()
+
+        Set<String> issueLabels = issue.getLabels().stream()
                 .map(Label::getLabel)
+                .map(String::toLowerCase)
                 .collect(Collectors.toSet());;
 
         return rule.getAllowedLabels().stream()
-                .anyMatch(labels::contains);
+                .map(String::toLowerCase)
+                .anyMatch(issueLabels::contains);
     }
 
     @Override
     public List<VisibilityRuleDTO> getRulesForProject(String projectKey) {
-        return _rules.stream()
-                .filter(rule -> rule.getProjectKey().equalsIgnoreCase(projectKey))
+        if(projectKey == null || projectKey.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        VisibilityRuleAO[] rules = _ao.find(
+                VisibilityRuleAO.class,
+                Query.select().where("PROJECT_KEY = ?", projectKey)
+        );
+
+        return Arrays.stream(rules)
+                .map(this::mapRuleToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void saveRule(VisibilityRuleDTO rule, ApplicationUser author) {
-        _rules.removeIf(existing ->
-                existing.getProjectKey().equalsIgnoreCase(rule.getProjectKey())
-                        && existing.getRoleName().equalsIgnoreCase(rule.getRoleName())
-        );
+        if (rule == null) {
+            return;
+        }
 
-        _rules.add(rule);
+        _ao.executeInTransaction(() -> {
+            VisibilityRuleAO[] existingRules = _ao.find(
+                    VisibilityRuleAO.class,
+                    Query.select().where(
+                            "PROJECT_KEY = ? AND ROLE_NAME = ?",
+                            rule.getProjectKey(),
+                            rule.getRoleName()
+                    )
+            );
+
+            VisibilityRuleAO ruleAO;
+
+            if (existingRules.length > 0) {
+                ruleAO = existingRules[0];
+            } else {
+                ruleAO = _ao.create(VisibilityRuleAO.class);
+            }
+
+            ruleAO.setProjectKey(rule.getProjectKey());
+            ruleAO.setRoleName(rule.getRoleName());
+            ruleAO.setAllowedLabels(String.join(",", rule.getAllowedLabels()));
+            ruleAO.setEnabled(rule.isEnabled());
+            ruleAO.save();
+
+            return null;
+        });
 
         _auditService.logVisibilityChange(author,
                 "Saved rule: project=" + rule.getProjectKey()
@@ -131,9 +174,18 @@ public class VisibilityServiceImpl implements VisibilityService {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, hours);
+        Date expiresAt = calendar.getTime();
 
-        TemporaryAccessDTO access = new TemporaryAccessDTO(projectKey, issueKey, username, calendar.getTime());
-        _temporaryAccesses.add(access);
+        _ao.executeInTransaction(() -> {
+            TemporaryAccessAO access = _ao.create(TemporaryAccessAO.class);
+            access.setProjectKey(projectKey);
+            access.setIssueKey(issueKey);
+            access.setUsername(username);
+            access.setExpiresAt(expiresAt);
+            access.save();
+
+            return null;
+        });
 
         _auditService.logVisibilityChange(author,
                 "Temporary access granted: project=" + projectKey
@@ -148,15 +200,69 @@ public class VisibilityServiceImpl implements VisibilityService {
     private boolean hasTemporaryAccess(String projectKey, String issueKey, String username) {
         Date now = new Date();
 
-        _temporaryAccesses.removeIf(access -> access.getExpiresAt().before(now));
+        TemporaryAccessAO[] accesses = _ao.find(
+                TemporaryAccessAO.class,
+                Query.select().where(
+                        "PROJECT_KEY = ? AND ISSUE_KEY = ? AND USERNAME = ?",
+                        projectKey,
+                        issueKey,
+                        username
+                )
+        );
 
-        return _temporaryAccesses.stream()
-                .anyMatch(access ->
-                        access.getProjectKey().equalsIgnoreCase(projectKey)
-                                && access.getIssueKey().equalsIgnoreCase(issueKey)
-                                && access.getUsername().equalsIgnoreCase(username)
-                                && access.getExpiresAt().after(now)
-                );
+        for (TemporaryAccessAO access : accesses) {
+            if (access.getExpiresAt().before(now)) {
+                _ao.delete(access);
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private VisibilityRuleDTO mapRuleToDTO(VisibilityRuleAO ruleAO) {
+        List<String> labels = Arrays.stream(ruleAO.getAllowedLabels().split(","))
+                .map(String::trim)
+                .filter(label -> !label.isEmpty())
+                .collect(Collectors.toList());
+
+        return new VisibilityRuleDTO(
+                ruleAO.getProjectKey(),
+                ruleAO.getRoleName(),
+                labels,
+                ruleAO.isEnabled()
+        );
+    }
+
+    private void createDefaultRulesIfNeeded() {
+        VisibilityRuleAO[] existingRules = _ao.find(
+                VisibilityRuleAO.class,
+                Query.select().where("PROJECT_KEY = ?", "TEST")
+        );
+
+        if (existingRules.length > 0) {
+            return;
+        }
+
+        saveDefaultRule("TEST", "frontend", Arrays.asList("frontend", "ui"));
+        saveDefaultRule("TEST", "backend", Arrays.asList("backend", "api"));
+        saveDefaultRule("TEST", "tester", Arrays.asList("test", "qa"));
+        saveDefaultRule("TEST", "designer", Arrays.asList("design", "des"));
+    }
+
+    private void saveDefaultRule(String projectKey, String roleName, List<String> labels) {
+        _ao.executeInTransaction(() -> {
+            VisibilityRuleAO ruleAO = _ao.create(VisibilityRuleAO.class);
+            ruleAO.setProjectKey(projectKey);
+            ruleAO.setRoleName(roleName);
+            ruleAO.setAllowedLabels(String.join(",", labels));
+            ruleAO.setEnabled(true);
+            ruleAO.save();
+
+            return null;
+        });
     }
 
     private boolean isTeamLead(ApplicationUser user) {
@@ -180,6 +286,10 @@ public class VisibilityServiceImpl implements VisibilityService {
 
         if (username.contains("test")) {
             return "tester";
+        }
+
+        if(username.contains("design")) {
+            return "designer";
         }
 
         return "member";
