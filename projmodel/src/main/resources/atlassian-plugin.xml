@@ -48,6 +48,9 @@
         <description>База данных плагина ProjModel</description>
         <entity>com.projmodel.plugin.ao.ReminderLogAO</entity>
         <entity>com.projmodel.plugin.ao.ReportTaskAO</entity>
+        <entity>com.projmodel.plugin.ao.VisibilityRuleAO</entity>
+        <entity>com.projmodel.plugin.ao.TemporaryAccessAO</entity>
+
     </ao>
 
     <!-- Workload Servlet -->
