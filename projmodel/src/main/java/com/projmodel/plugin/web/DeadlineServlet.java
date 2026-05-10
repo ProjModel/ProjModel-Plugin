@@ -63,7 +63,7 @@ public class DeadlineServlet extends HttpServlet {
 
         templateRenderer.render("/templates/deadline.vm", context, resp.getWriter());
     }
-    
+
     private Map<String, Integer> calculateStats(List<DeadlineIssueDTO> issues) {
         Map<String, Integer> stats = new LinkedHashMap<>();
 

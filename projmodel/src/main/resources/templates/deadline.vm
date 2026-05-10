@@ -17,7 +17,7 @@
     <div class="projmodel-card" style="margin-bottom: 24px;">
         <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/deadline" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
             <label for="projectKey" style="font-weight: 600; white-space: nowrap;">Проект:</label>
-            <select name="projectKey" id="projectKey" style="padding: 10px 14px; border: 1px solid #dfe1e6; border-radius: 6px; font-size: 14px; min-width: 250px;">
+            <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #dfe1e6; border-radius: 6px; font-size: 14px; min-width: 250px;">
                 #if($projects.isEmpty())
                     <option value="">-- Нет доступных проектов --</option>
                 #else
@@ -28,13 +28,15 @@
                     #end
                 #end
             </select>
-            <button type="submit" style="padding: 10px 24px; background: #0052cc; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                Анализировать
-            </button>
+            <noscript>
+                <button type="submit" style="padding: 10px 24px; background: #0052cc; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Анализировать
+                </button>
+            </noscript>
         </form>
     </div>
 
-    #if($projectKey && !$openIssues.isEmpty())
+    #if($projectKey && $deadlineIssues && !$deadlineIssues.isEmpty())
         <!-- Сводная статистика -->
         <div class="deadline-stats">
             <div class="stat-card">
@@ -57,59 +59,48 @@
                 <div class="stat-number">$stats.low</div>
                 <div class="stat-label">Низкий риск</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color: #999;">$stats.noDeadline</div>
+                <div class="stat-label">Без дедлайна</div>
+            </div>
         </div>
 
-        <!-- Таблица задач с цветовой индикацией -->
+        <!-- Таблица задач -->
         <div class="deadline-table-wrapper">
             <table class="deadline-table">
                 <thead>
                     <tr>
-                        <th>ID задачи</th>
+                        <th>Ключ</th>
                         <th>Название</th>
                         <th>Исполнитель</th>
                         <th>Дедлайн</th>
-                        <th>Риск</th>
+                        <th>Статус</th>
+                        <th>Уровень риска</th>
                     </tr>
                 </thead>
                 <tbody>
-                    #foreach($issue in $openIssues)
-                        #set($riskLevel = "risk-low")
-                        #set($riskBadge = "low")
-                        #set($riskText = "Низкий")
-
-                        ## Логика определения уровня риска (дублирует серверную)
-                        #if($issue.getDueDate())
-                            ## Здесь можно передавать уровень риска из DTO, если добавить поле в IssueViewDTO
-                            ## Пока оставим упрощённую логику на Velocity (можно вынести в сервис)
-                            #set($now = $req.getAttribute("now"))
-                        #else
-                            #set($riskLevel = "risk-low")
-                            #set($riskBadge = "low")
-                            #set($riskText = "Без дедлайна")
-                        #end
-
-                        ## TODO: улучшить, когда IssueViewDTO будет содержать поле riskLevel
-                        ## Пока используем цветовую индикацию на основе наличия дедлайна
-                        <tr class="$riskLevel">
-                            <td><strong>$issue.get_key()</strong></td>
-                            <td>$issue.get_summary()</td>
+                    #foreach($issue in $deadlineIssues)
+                        <tr class="$issue.getRowClass()">
+                            <td><strong>$issue.getIssueKey()</strong></td>
+                            <td>$issue.getSummary()</td>
                             <td>$issue.getAssignee()</td>
                             <td>
                                 #if($issue.getDueDate())
                                     $issue.getDueDate()
                                 #else
-                                    <span style="color: #999; font-style: italic;">Не задан</span>
+                                    <span style="color: #999; font-style: italic;">—</span>
                                 #end
                             </td>
-                            <td><span class="risk-badge $riskBadge">$riskText</span></td>
+                            <td>$issue.getStatus()</td>
+                            <td><span class="risk-badge $issue.getRiskBadge()">$issue.getRiskText()</span></td>
                         </tr>
                     #end
                 </tbody>
             </table>
         </div>
 
-    #elseif($projectKey && $openIssues.isEmpty())
-        <!-- Проект выбран, но нет открытых задач -->
+    #elseif($projectKey)
+        <!-- Проект выбран, но нет задач -->
         <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
             <div class="projmodel-mvp-badge">Нет данных</div>
             <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
@@ -117,11 +108,11 @@
             </p>
         </div>
     #else
-        <!-- Ни один проект не выбран (пустое состояние) -->
+        <!-- Проект не выбран -->
         <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
             <div class="projmodel-mvp-badge">Выберите проект</div>
             <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
-                Выберите проект из выпадающего списка и нажмите «Анализировать» для отображения данных.
+                Выберите проект из выпадающего списка для отображения анализа дедлайнов.
             </p>
         </div>
     #end
