@@ -74,32 +74,21 @@ public class DeadlineAnalysisServiceImpl implements DeadlineAnalysisService {
         return result;
     }
 
-    /**
-     * Рассчитать уровень риска по дедлайну
-     *
-     * @param dueDate дедлайн задачи (может быть null)
-     * @param now текущее время
-     * @param endOfToday конец текущего дня (23:59:59)
-     * @param threeDaysLater дата через 3 дня
-     * @param sevenDaysLater дата через 7 дней
-     * @return уровень риска: CRITICAL, HIGH, MEDIUM, LOW или NO_DEADLINE
-     */
     private String calculateRiskLevel(Date dueDate, Date now, Date endOfToday,
                                       Date threeDaysLater, Date sevenDaysLater) {
-        // Правило 1: дедлайн отсутствует
         if (dueDate == null) {
             return "NO_DEADLINE";
         }
 
-        if (dueDate.before(now) || (dueDate.before(endOfToday) || dueDate.equals(endOfToday))) {
+        if (dueDate.before(endOfToday)) {
             return "CRITICAL";
         }
 
-        if (dueDate.before(threeDaysLater)) {
+        if (!dueDate.after(threeDaysLater)) {
             return "HIGH";
         }
         
-        if (dueDate.before(sevenDaysLater)) {
+        if (!dueDate.after(sevenDaysLater)) {
             return "MEDIUM";
         }
 
