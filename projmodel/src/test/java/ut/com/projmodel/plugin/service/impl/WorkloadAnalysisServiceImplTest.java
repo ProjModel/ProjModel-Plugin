@@ -342,8 +342,11 @@ public class WorkloadAnalysisServiceImplTest {
 
         // Assert
         assertEquals(1, result.size());
-        assertEquals("Дедлайн ровно через 7 дней должен быть в пределах 7 дней",
-                1, result.get(0).getTasksDueWithin7Days());
+        // Дедлайн ровно через 7 дней НЕ попадает в "в пределах 7 дней" (логика: dueDate.before())
+        assertEquals("Ровно 7 дней — не считается срочным (before, не before/equals)",
+                0, result.get(0).getTasksDueWithin7Days());
+        assertEquals("Общее количество задач должно быть 1",
+                1, result.get(0).getTotalTasks());
     }
 
     // ==================== Граничные тесты ====================
