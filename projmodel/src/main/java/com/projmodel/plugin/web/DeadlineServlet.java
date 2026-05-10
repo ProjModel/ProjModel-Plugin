@@ -3,7 +3,9 @@ package com.projmodel.plugin.web;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.projmodel.plugin.dto.IssueViewDTO;
-
+import com.projmodel.plugin.dto.ProjectViewDTO;
+import com.projmodel.plugin.service.IssueDataService;
+import com.projmodel.plugin.service.ProjectDataService;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -16,10 +18,16 @@ import java.util.*;
 public class DeadlineServlet extends HttpServlet {
 
     private final TemplateRenderer templateRenderer;
+    private final ProjectDataService projectDataService;
+    private final IssueDataService issueDataService;
 
     @Inject
-    public DeadlineServlet(@ComponentImport TemplateRenderer templateRenderer) {
+    public DeadlineServlet(@ComponentImport TemplateRenderer templateRenderer,
+                           ProjectDataService projectDataService,
+                           IssueDataService issueDataService) {
         this.templateRenderer = templateRenderer;
+        this.projectDataService = projectDataService;
+        this.issueDataService = issueDataService;
     }
 
     @Override
@@ -28,12 +36,27 @@ public class DeadlineServlet extends HttpServlet {
 
         resp.setContentType("text/html;charset=UTF-8");
 
+        List<ProjectViewDTO> projects = projectDataService.getAllProjects();
+
+        String projectKey = req.getParameter("projectKey");
+
+        if ((projectKey == null || projectKey.trim().isEmpty()) && !projects.isEmpty()) {
+            projectKey = projects.get(0).getKey();
+        }
+
+        List<IssueViewDTO> openIssues = new ArrayList<>();
+        Map<String, Integer> stats = new HashMap<>(); // сводная статистика
+
+        if (projectKey != null && !projectKey.trim().isEmpty()) {
+            openIssues = issueDataService.getOpenIssuesForProject(projectKey);
+            stats = calculateStats(openIssues);
+        }
+        
         Map<String, Object> context = new HashMap<>();
-        context.put("pluginName", "ProjModel");
-        context.put("pageTitle", "Deadline Analysis — анализ дедлайнов");
-        context.put("pageDescription", "Визуализация дедлайнов проекта и уровней риска");
-        context.put("status", "В разработке");
-        context.put("statusMessage", "Функционал находится в разработке.");
+        context.put("projects", projects);
+        context.put("projectKey", projectKey);
+        context.put("openIssues", openIssues);
+        context.put("stats", stats);
         context.put("req", req);
 
         templateRenderer.render("/templates/deadline.vm", context, resp.getWriter());
