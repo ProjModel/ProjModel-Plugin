@@ -51,7 +51,7 @@ public class DeadlineServlet extends HttpServlet {
             openIssues = issueDataService.getOpenIssuesForProject(projectKey);
             stats = calculateStats(openIssues);
         }
-        
+
         Map<String, Object> context = new HashMap<>();
         context.put("projects", projects);
         context.put("projectKey", projectKey);
