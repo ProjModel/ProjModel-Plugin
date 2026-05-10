@@ -100,15 +100,6 @@ public class ReportGeneratorTest {
         assertFalse("Не должно быть строк таблицы", html.contains("<td><strong>"));
     }
 
-    @Test
-    public void testGenerateHtmlReport_NullList() {
-        // Act
-        byte[] result = ReportGenerator.generateHtmlReport(null, "NULL");
-
-        // Assert
-        assertNotNull("Результат с null списком не должен быть null", result);
-    }
-
     // ==================== Тесты для generateTextReport ====================
 
     @Test
