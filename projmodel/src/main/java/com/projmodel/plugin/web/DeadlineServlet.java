@@ -2,9 +2,9 @@ package com.projmodel.plugin.web;
 
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.projmodel.plugin.dto.IssueViewDTO;
+import com.projmodel.plugin.dto.DeadlineIssueDTO;
 import com.projmodel.plugin.dto.ProjectViewDTO;
-import com.projmodel.plugin.service.IssueDataService;
+import com.projmodel.plugin.service.DeadlineAnalysisService;
 import com.projmodel.plugin.service.ProjectDataService;
 
 import javax.inject.Inject;
@@ -13,21 +13,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DeadlineServlet extends HttpServlet {
 
     private final TemplateRenderer templateRenderer;
     private final ProjectDataService projectDataService;
-    private final IssueDataService issueDataService;
+    private final DeadlineAnalysisService deadlineAnalysisService;
 
     @Inject
     public DeadlineServlet(@ComponentImport TemplateRenderer templateRenderer,
                            ProjectDataService projectDataService,
-                           IssueDataService issueDataService) {
+                           DeadlineAnalysisService deadlineAnalysisService) {
         this.templateRenderer = templateRenderer;
         this.projectDataService = projectDataService;
-        this.issueDataService = issueDataService;
+        this.deadlineAnalysisService = deadlineAnalysisService;
     }
 
     @Override
@@ -44,54 +47,47 @@ public class DeadlineServlet extends HttpServlet {
             projectKey = projects.get(0).getKey();
         }
 
-        List<IssueViewDTO> openIssues = new ArrayList<>();
-        Map<String, Integer> stats = new HashMap<>(); // сводная статистика
-
+        List<DeadlineIssueDTO> deadlineIssues = null;
         if (projectKey != null && !projectKey.trim().isEmpty()) {
-            openIssues = issueDataService.getOpenIssuesForProject(projectKey);
-            stats = calculateStats(openIssues);
+            deadlineIssues = deadlineAnalysisService.analyzeDeadlines(projectKey);
         }
+
+        Map<String, Integer> stats = calculateStats(deadlineIssues);
 
         Map<String, Object> context = new HashMap<>();
         context.put("projects", projects);
         context.put("projectKey", projectKey);
-        context.put("openIssues", openIssues);
+        context.put("deadlineIssues", deadlineIssues);
         context.put("stats", stats);
         context.put("req", req);
 
         templateRenderer.render("/templates/deadline.vm", context, resp.getWriter());
     }
-
-    private Map<String, Integer> calculateStats(List<IssueViewDTO> issues) {
+    
+    private Map<String, Integer> calculateStats(List<DeadlineIssueDTO> issues) {
         Map<String, Integer> stats = new LinkedHashMap<>();
+
+        if (issues == null) {
+            stats.put("total", 0);
+            stats.put("critical", 0);
+            stats.put("high", 0);
+            stats.put("medium", 0);
+            stats.put("low", 0);
+            stats.put("noDeadline", 0);
+            return stats;
+        }
+
         stats.put("total", issues.size());
 
-        int critical = 0;  // просроченные или дедлайн сегодня
-        int high = 0;      // дедлайн в ближайшие 3 дня
-        int medium = 0;    // дедлайн в ближайшие 7 дней
-        int low = 0;       // остальные
+        int critical = 0, high = 0, medium = 0, low = 0, noDeadline = 0;
 
-        Date now = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(now);
-        cal.add(Calendar.DAY_OF_YEAR, 3);
-        Date threeDaysLater = cal.getTime();
-        cal.setTime(now);
-        cal.add(Calendar.DAY_OF_YEAR, 7);
-        Date sevenDaysLater = cal.getTime();
-
-        for (IssueViewDTO issue : issues) {
-            Date dueDate = issue.getDueDate();
-            if (dueDate == null) {
-                low++;
-            } else if (dueDate.before(now)) {
-                critical++;
-            } else if (dueDate.before(threeDaysLater)) {
-                high++;
-            } else if (dueDate.before(sevenDaysLater)) {
-                medium++;
-            } else {
-                low++;
+        for (DeadlineIssueDTO issue : issues) {
+            switch (issue.getRiskLevel()) {
+                case "CRITICAL": critical++; break;
+                case "HIGH": high++; break;
+                case "MEDIUM": medium++; break;
+                case "LOW": low++; break;
+                case "NO_DEADLINE": noDeadline++; break;
             }
         }
 
@@ -99,6 +95,7 @@ public class DeadlineServlet extends HttpServlet {
         stats.put("high", high);
         stats.put("medium", medium);
         stats.put("low", low);
+        stats.put("noDeadline", noDeadline);
 
         return stats;
     }
