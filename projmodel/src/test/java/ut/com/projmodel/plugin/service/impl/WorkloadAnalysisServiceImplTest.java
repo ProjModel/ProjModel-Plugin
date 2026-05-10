@@ -11,9 +11,6 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-/**
- * Модульные тесты для WorkloadAnalysisServiceImpl (без Mockito)
- */
 public class WorkloadAnalysisServiceImplTest {
 
     private WorkloadAnalysisServiceImpl workloadAnalysisService;
