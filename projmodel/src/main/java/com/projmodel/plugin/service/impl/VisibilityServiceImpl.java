@@ -83,27 +83,25 @@ public class VisibilityServiceImpl implements VisibilityService {
             return true;
         }
 
-        String userRole = getUserRole(user);
-
-        Optional<VisibilityRuleDTO> ruleOptional = getRulesForProject(projectKey).stream()
-                .filter(VisibilityRuleDTO::isEnabled)
-                .filter(rule -> rule.getRoleName().equalsIgnoreCase(userRole))
-                .findFirst();
-
-        if (!ruleOptional.isPresent()) {
-            return false;
-        }
-
-        VisibilityRuleDTO rule = ruleOptional.get();
-
         Set<String> issueLabels = issue.getLabels().stream()
                 .map(Label::getLabel)
                 .map(String::toLowerCase)
-                .collect(Collectors.toSet());;
+                .collect(Collectors.toSet());
 
-        return rule.getAllowedLabels().stream()
-                .map(String::toLowerCase)
-                .anyMatch(issueLabels::contains);
+        String username = user.getName().toLowerCase();
+
+        Set<String> usernameParts = Arrays.stream(username.split("[_\\-.]"))
+                .map(String::trim)
+                .filter(part -> !part.isEmpty())
+                .collect(Collectors.toSet());
+
+        for (String label : issueLabels) {
+            if (usernameParts.contains(label)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -302,27 +300,4 @@ public class VisibilityServiceImpl implements VisibilityService {
                 || username.contains("lead")
                 || username.contains("teamlead");
     }
-
-    private String getUserRole(ApplicationUser user) {
-        String username = user.getName().toLowerCase();
-
-        if (username.contains("front")) {
-            return "frontend";
-        }
-
-        if (username.contains("back")) {
-            return "backend";
-        }
-
-        if (username.contains("test")) {
-            return "tester";
-        }
-
-        if(username.contains("design")) {
-            return "designer";
-        }
-
-        return "member";
-    }
-
 }

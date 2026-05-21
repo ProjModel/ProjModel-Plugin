@@ -71,15 +71,8 @@ public class VisibilitySettingsServlet extends HttpServlet {
                 resp.getWriter().println("</ul>");
             }
 
-            resp.getWriter().println("<h3>Добавить / обновить правило</h3>");
-            resp.getWriter().println("<form method='post'>");
-            resp.getWriter().println("<input type='hidden' name='action' value='saveRule'>");
-            resp.getWriter().println("<input type='hidden' name='projectKey' value='" + safe(projectKey) + "'>");
-            resp.getWriter().println("<p>Role: <input name='roleName' placeholder='frontend'></p>");
-            resp.getWriter().println("<p>Labels: <input name='labels' placeholder='frontend, ui'></p>");
-            resp.getWriter().println("<p>Enabled: <input type='checkbox' name='enabled' checked></p>");
-            resp.getWriter().println("<button type='submit'>Сохранить правило</button>");
-            resp.getWriter().println("</form>");
+            resp.getWriter().println("<h3>Задача видна пользователю, если один из labels задачи\n" +
+                    "совпадает с частью username пользователя.</h3>");
 
             resp.getWriter().println("<h3>Временный доступ</h3>");
             resp.getWriter().println("<form method='post'>");
