@@ -1,7 +1,6 @@
 package com.projmodel.plugin.ai;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -12,140 +11,90 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 public class AIClient {
-    private final AIConfig config;
     private final Gson gson;
 
     public AIClient() {
-        this.config = new AIConfig();
         this.gson = new Gson();
     }
 
     public AIClient(AIConfig config) {
-        this.config = config;
         this.gson = new Gson();
     }
 
     public String sendMessage(String systemPrompt, String userMessage) throws IOException {
-        // Пробуем разные модели по порядку
-        String[] models = {
-                "google/gemini-2.0-flash-exp:free",     // Gemini 2.0 Flash (бесплатный)
-                "google/gemini-flash-1.5:free",          // Gemini 1.5 Flash (бесплатный)
-                "meta-llama/llama-3.2-3b-instruct:free", // Llama 3.2 3B (бесплатный)
-                "mistralai/mistral-7b-instruct:free"      // Mistral 7B (бесплатный)
-        };
-
-        IOException lastException = null;
-
-        // Пробуем каждую модель, пока какая-то не сработает
-        for (String model : models) {
-            try {
-                return trySendMessage(model, systemPrompt, userMessage);
-            } catch (IOException e) {
-                lastException = e;
-                // Если это не 404 (модель не найдена), а другая ошибка - выбрасываем сразу
-                if (!e.getMessage().contains("404")) {
-                    throw e;
-                }
-                // Иначе пробуем следующую модель
-                System.out.println("[ProjModel] Модель " + model + " недоступна, пробуем следующую...");
-            }
-        }
-
-        throw lastException != null ? lastException : new IOException("Все модели недоступны");
-    }
-
-    private String trySendMessage(String model, String systemPrompt, String userMessage) throws IOException {
         HttpURLConnection connection = null;
 
         try {
-            URL url = new URL("https://openrouter.ai/api/v1/chat/completions");
+            URL url = new URL("http://localhost:11434/api/generate");
             connection = (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + config.getApiKey());
-            connection.setRequestProperty("HTTP-Referer", "http://localhost:2990/jira");
-            connection.setRequestProperty("X-Title", "ProjModel Jira Plugin");
             connection.setDoOutput(true);
-            connection.setConnectTimeout(30000);
-            connection.setReadTimeout(60000);
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(120000);
 
-            // Формируем тело запроса
+            String fullPrompt;
+            if (userMessage != null && !userMessage.isEmpty()) {
+                fullPrompt = systemPrompt + "\n\n" + userMessage;
+            } else {
+                fullPrompt = systemPrompt;
+            }
+
             JsonObject requestBody = new JsonObject();
-            requestBody.addProperty("model", model);
+            requestBody.addProperty("model", "gemma2:2b");
+            requestBody.addProperty("prompt", fullPrompt);
+            requestBody.addProperty("stream", false);
 
-            JsonArray messages = new JsonArray();
+            JsonObject options = new JsonObject();
+            options.addProperty("temperature", 0.3);
+            options.addProperty("num_predict", 2000);
+            requestBody.add("options", options);
 
-            JsonObject systemMsg = new JsonObject();
-            systemMsg.addProperty("role", "system");
-            systemMsg.addProperty("content", systemPrompt);
-            messages.add(systemMsg);
-
-            JsonObject userMsg = new JsonObject();
-            userMsg.addProperty("role", "user");
-            userMsg.addProperty("content", userMessage);
-            messages.add(userMsg);
-
-            requestBody.add("messages", messages);
-            requestBody.addProperty("temperature", 0.3);
-            requestBody.addProperty("max_tokens", 2000);
-
-            String jsonInputString = gson.toJson(requestBody);
+            String jsonBody = gson.toJson(requestBody);
 
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
             int responseCode = connection.getResponseCode();
 
             if (responseCode != 200) {
-                StringBuilder errorResponse = new StringBuilder();
-                try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8))) {
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        errorResponse.append(responseLine.trim());
-                    }
-                }
-                throw new IOException("API Error " + responseCode + ": " + errorResponse.toString());
+                throw new IOException("Ollama error: " + responseCode);
             }
 
             StringBuilder response = new StringBuilder();
             try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
+                String line;
+                while ((line = br.readLine()) != null) {
+                    response.append(line.trim());
                 }
             }
-
-            System.out.println("[ProjModel] Ответ от API: " + response.toString().substring(0, Math.min(200, response.length())));
 
             JsonObject responseJson = JsonParser.parseString(response.toString()).getAsJsonObject();
-            JsonArray choices = responseJson.getAsJsonArray("choices");
 
-            if (choices != null && choices.size() > 0) {
-                JsonObject firstChoice = choices.get(0).getAsJsonObject();
-                JsonObject message = firstChoice.getAsJsonObject("message");
+            if (responseJson.has("response")) {
+                String aiResponse = responseJson.get("response").getAsString();
 
-                // Проверяем, есть ли content
-                if (message.has("content") && !message.get("content").isJsonNull()) {
-                    return message.get("content").getAsString();
+                // Если ответ не содержит HTML - добавляем базовое форматирование
+                if (!aiResponse.contains("<h3>") && !aiResponse.contains("<ul>")) {
+                    aiResponse = aiResponse
+                            .replace("\n\n", "</p><p>")
+                            .replace("\n", "<br>");
+                    aiResponse = "<p>" + aiResponse + "</p>";
                 }
 
-                // Если content null, проверяем reason
-                if (message.has("reason")) {
-                    return "Модель отказалась отвечать. Причина: " + message.get("reason").getAsString();
-                }
+                return aiResponse;
             }
 
-            return "Ошибка: неожиданный формат ответа от API";
+            return "Пустой ответ от модели";
 
+        } catch (java.net.ConnectException e) {
+            throw new IOException("Ollama не запущена! Проверьте значок в трее.");
         } finally {
             if (connection != null) {
                 connection.disconnect();
