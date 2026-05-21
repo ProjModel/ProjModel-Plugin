@@ -109,7 +109,7 @@ public class VisibilityServiceImpl implements VisibilityService {
     @Override
     public List<VisibilityRuleDTO> getRulesForProject(String projectKey) {
 
-        createDefaultRulesIfNeeded();
+        createDefaultRulesIfNeeded(projectKey);
 
         if(projectKey == null || projectKey.isBlank()) {
             return Collections.emptyList();
@@ -236,10 +236,14 @@ public class VisibilityServiceImpl implements VisibilityService {
         );
     }
 
-    private void createDefaultRulesIfNeeded() {
+    private void createDefaultRulesIfNeeded(String projectKey) {
+        if(projectKey == null || projectKey.isBlank()) {
+            return;
+        }
+
         VisibilityRuleAO[] existingRules = _ao.find(
                 VisibilityRuleAO.class,
-                Query.select().where("PROJECT_KEY = ?", "TEST")
+                Query.select().where("PROJECT_KEY = ?", projectKey)
         );
 
         if (existingRules.length > 0) {
