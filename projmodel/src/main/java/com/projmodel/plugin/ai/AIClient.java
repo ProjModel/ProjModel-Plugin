@@ -44,7 +44,7 @@ public class AIClient {
             }
 
             JsonObject requestBody = new JsonObject();
-            requestBody.addProperty("model", "qwen2.5:3b");  // ← Новая модель
+            requestBody.addProperty("model", "qwen2.5:3b");
             requestBody.addProperty("prompt", fullPrompt);
             requestBody.addProperty("stream", false);
 

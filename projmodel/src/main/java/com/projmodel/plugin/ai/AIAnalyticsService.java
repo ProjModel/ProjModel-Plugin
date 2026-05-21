@@ -80,10 +80,10 @@ public class AIAnalyticsService {
         for (WorkloadViewDTO w : workloadData) {
             String loadEmoji;
             switch (w.getLoadLevel()) {
-                case "critical": loadEmoji = "🔴 КРИТИЧЕСКАЯ"; break;
-                case "high": loadEmoji = "🟠 ВЫСОКАЯ"; break;
-                case "medium": loadEmoji = "🟡 СРЕДНЯЯ"; break;
-                default: loadEmoji = "🟢 НИЗКАЯ"; break;
+                case "critical": loadEmoji = "КРИТИЧЕСКАЯ"; break;
+                case "high": loadEmoji = "ВЫСОКАЯ"; break;
+                case "medium": loadEmoji = "СРЕДНЯЯ"; break;
+                default: loadEmoji = "НИЗКАЯ"; break;
             }
 
             data.append("• ").append(w.getAssignee()).append("\n");
