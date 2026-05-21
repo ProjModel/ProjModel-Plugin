@@ -94,15 +94,15 @@
         <div class="ai-tabs">
             <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics?projectKey=$projectKey&type=general"
                class="ai-tab #if($analysisType == 'general')active#end">
-                🧠 Общий анализ
+                Общий анализ
             </a>
             <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics?projectKey=$projectKey&type=deadlines"
                class="ai-tab #if($analysisType == 'deadlines')active#end">
-                ⏰ Дедлайны
+                Дедлайны
             </a>
             <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics?projectKey=$projectKey&type=workload"
                class="ai-tab #if($analysisType == 'workload')active#end">
-                📊 Загрузка
+                Загрузка
             </a>
         </div>
 
@@ -116,7 +116,7 @@
         </div>
 
         #if($aiAnalysis)
-            <div class="ai-analysis-content">
+            <div class="ai-analysis-content" style="white-space: pre-line;">
                 $aiAnalysis
             </div>
         #elseif($aiError)

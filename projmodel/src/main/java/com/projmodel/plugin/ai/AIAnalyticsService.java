@@ -1,72 +1,123 @@
 package com.projmodel.plugin.ai;
 
-import com.atlassian.plugin.spring.scanner.annotation.export.ExportAsService;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.projmodel.plugin.dto.DeadlineIssueDTO;
 import com.projmodel.plugin.dto.WorkloadViewDTO;
 
-import javax.inject.Named;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
-@Named
-@ExportAsService
 public class AIAnalyticsService {
     private final AIClient aiClient;
     private final Gson gson;
 
     public AIAnalyticsService() {
         this.aiClient = new AIClient();
-        this.gson = new Gson();
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     public AIAnalyticsService(AIClient aiClient) {
         this.aiClient = aiClient;
-        this.gson = new Gson();
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     public String analyzeDeadlines(List<DeadlineIssueDTO> deadlineIssues) throws IOException {
-        String systemPrompt = "Ты - AI-аналитик для Jira плагина ProjModel. " +
-                "Твоя задача - анализировать дедлайны задач и давать рекомендации. " +
-                "Отвечай на русском языке. Форматируй ответ красиво с использованием HTML-тегов: " +
-                "<h3> для подзаголовков, <ul><li> для списков, <strong> для выделения важного.";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        StringBuilder data = new StringBuilder();
 
-        String userMessage = "Проанализируй следующие задачи проекта и их дедлайны. " +
-                "Выяви проблемные зоны, риски срыва сроков и дай конкретные рекомендации по управлению дедлайнами:\n\n" +
-                gson.toJson(deadlineIssues);
+        for (DeadlineIssueDTO issue : deadlineIssues) {
+            data.append("• ").append(issue.getIssueKey())
+                    .append(" - ").append(issue.getSummary()).append("\n");
+            data.append("  Статус: ").append(issue.getStatus())
+                    .append(" | Исполнитель: ").append(issue.getAssignee()).append("\n");
+            if (issue.getDueDate() != null) {
+                data.append("  Дедлайн: ").append(sdf.format(issue.getDueDate())).append("\n");
+            } else {
+                data.append("  Дедлайн: НЕ УСТАНОВЛЕН\n");
+            }
+            data.append("  Уровень риска: ").append(issue.getRiskLevel()).append("\n\n");
+        }
 
-        return aiClient.sendMessage(systemPrompt, userMessage);
+        String prompt = "Ты — AI-аналитик плагина ProjModel для Jira. Проанализируй дедлайны задач и дай рекомендации.Используй Story Points для анализа.\n\n" +
+                "В ответе должны быть:\n" +
+                "- Общая оценка ситуации с дедлайнами\n" +
+                "- Перечень критических и проблемных задач\n" +
+                "- Конкретные рекомендации по управлению сроками\n\n" +
+                "Пиши на русском языке. Будь конкретным и полезным. Обращай внимание на название задач.\n\n" +
+                "ДАННЫЕ ДЛЯ АНАЛИЗА:\n" + data.toString();
+
+        return aiClient.sendMessage(prompt, "");
     }
 
     public String analyzeWorkload(List<WorkloadViewDTO> workloadData) throws IOException {
-        String systemPrompt = "Ты - AI-аналитик для Jira плагина ProjModel. " +
-                "Твоя задача - анализировать загрузку участников команды и давать рекомендации " +
-                "по перераспределению задач. " +
-                "Отвечай на русском языке. Форматируй ответ красиво с использованием HTML-тегов: " +
-                "<h3> для подзаголовков, <ul><li> для списков, <strong> для выделения важного.";
+        StringBuilder data = new StringBuilder();
 
-        String userMessage = "Проанализируй загрузку участников команды. " +
-                "Выяви перегруженных и недогруженных сотрудников. " +
-                "Предложи оптимальное перераспределение задач:\n\n" +
-                gson.toJson(workloadData);
+        for (WorkloadViewDTO w : workloadData) {
+            String loadEmoji;
+            switch (w.getLoadLevel()) {
+                case "critical": loadEmoji = "🔴 КРИТИЧЕСКАЯ"; break;
+                case "high": loadEmoji = "🟠 ВЫСОКАЯ"; break;
+                case "medium": loadEmoji = "🟡 СРЕДНЯЯ"; break;
+                default: loadEmoji = "🟢 НИЗКАЯ"; break;
+            }
 
-        return aiClient.sendMessage(systemPrompt, userMessage);
+            data.append("• ").append(w.getAssignee()).append("\n");
+            data.append("  Всего задач: ").append(w.getTotalTasks())
+                    .append(" | Просрочено: ").append(w.getOverdueTasks())
+                    .append(" | Срочных (≤7 дней): ").append(w.getTasksDueWithin7Days())
+                    .append(" | Без дедлайна: ").append(w.getTasksWithoutDueDate()).append("\n");
+            data.append("  Нагрузка: ").append(loadEmoji).append("\n\n");
+        }
+
+        String prompt = "Ты — AI-аналитик плагина ProjModel для Jira. Проанализируй загрузку команды и дай рекомендации.\n\n" +
+                "В ответе должны быть:\n" +
+                "- Общая оценка загрузки команды\n" +
+                "- Кто перегружен и кто недогружен\n" +
+                "- Рекомендации по перераспределению задач\n\n" +
+                "Пиши на русском языке. Будь конкретным.Обращай внимание на название задач.\n\n" +
+                "ДАННЫЕ ДЛЯ АНАЛИЗА:\n" + data.toString();
+
+        return aiClient.sendMessage(prompt, "");
     }
 
     public String getGeneralRecommendations(List<DeadlineIssueDTO> deadlineIssues,
                                             List<WorkloadViewDTO> workloadData) throws IOException {
-        String systemPrompt = "Ты - AI-аналитик для Jira плагина ProjModel. " +
-                "Твоя задача - дать комплексный анализ проекта на основе данных о дедлайнах и загрузке команды. " +
-                "Отвечай на русском языке. Форматируй ответ красиво с использованием HTML-тегов: " +
-                "<h3> для подзаголовков, <ul><li> для списков, <strong> для выделения важного.";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        StringBuilder data = new StringBuilder();
 
-        StringBuilder userMessage = new StringBuilder();
-        userMessage.append("Дай комплексный анализ проекта на основе следующих данных:\n\n");
-        userMessage.append("=== ДЕДЛАЙНЫ ===\n");
-        userMessage.append(gson.toJson(deadlineIssues));
-        userMessage.append("\n\n=== ЗАГРУЗКА КОМАНДЫ ===\n");
-        userMessage.append(gson.toJson(workloadData));
+        data.append("=== ДЕДЛАЙНЫ ===\n");
+        for (DeadlineIssueDTO issue : deadlineIssues) {
+            data.append("• ").append(issue.getIssueKey())
+                    .append(" - ").append(issue.getSummary())
+                    .append(" | Статус: ").append(issue.getStatus())
+                    .append(" | Исполнитель: ").append(issue.getAssignee());
+            if (issue.getDueDate() != null) {
+                data.append(" | Дедлайн: ").append(sdf.format(issue.getDueDate()));
+            }
+            data.append(" | Риск: ").append(issue.getRiskLevel()).append("\n");
+        }
 
-        return aiClient.sendMessage(systemPrompt, userMessage.toString());
+        data.append("\n=== ЗАГРУЗКА КОМАНДЫ ===\n");
+        for (WorkloadViewDTO w : workloadData) {
+            data.append("• ").append(w.getAssignee())
+                    .append(" | Задач: ").append(w.getTotalTasks())
+                    .append(" | Просрочено: ").append(w.getOverdueTasks())
+                    .append(" | Срочных: ").append(w.getTasksDueWithin7Days())
+                    .append(" | Нагрузка: ").append(w.getLoadLevel()).append("\n");
+        }
+
+        String prompt = "Ты — AI-аналитик плагина ProjModel для Jira. Дай комплексный анализ проекта.\n\n" +
+                "В ответе должны быть:\n" +
+                "- Общее состояние проекта (хорошо/проблемы/критично)\n" +
+                "- Основные риски (2-3 самых важных)\n" +
+                "- Рекомендации (5-6 конкретных шагов)\n" +
+                "- Прогноз по срокам\n\n" +
+                "- Обращай внимание на название задач и анализируй насколько они реальная для выполнения за данный промежуток\n\n" +
+                "Пиши на русском языке. Будь конкретным.\n\n" +
+                "ДАННЫЕ ДЛЯ АНАЛИЗА:\n" + data.toString();
+
+        return aiClient.sendMessage(prompt, "");
     }
 }

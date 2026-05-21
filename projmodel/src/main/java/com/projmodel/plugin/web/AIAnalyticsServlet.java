@@ -11,7 +11,6 @@ import com.projmodel.plugin.service.ProjectDataService;
 import com.projmodel.plugin.service.WorkloadAnalysisService;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Named
 public class AIAnalyticsServlet extends HttpServlet {
 
     private final TemplateRenderer templateRenderer;
@@ -34,13 +32,12 @@ public class AIAnalyticsServlet extends HttpServlet {
     public AIAnalyticsServlet(@ComponentImport TemplateRenderer templateRenderer,
                               ProjectDataService projectDataService,
                               DeadlineAnalysisService deadlineAnalysisService,
-                              WorkloadAnalysisService workloadAnalysisService,
-                              AIAnalyticsService aiAnalyticsService) {
+                              WorkloadAnalysisService workloadAnalysisService) {
         this.templateRenderer = templateRenderer;
         this.projectDataService = projectDataService;
         this.deadlineAnalysisService = deadlineAnalysisService;
         this.workloadAnalysisService = workloadAnalysisService;
-        this.aiAnalyticsService = aiAnalyticsService;
+        this.aiAnalyticsService = new AIAnalyticsService();  // ← Создаем вручную
     }
 
     @Override
@@ -89,6 +86,7 @@ public class AIAnalyticsServlet extends HttpServlet {
 
             } catch (Exception e) {
                 context.put("aiError", "Ошибка при получении AI-анализа: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 

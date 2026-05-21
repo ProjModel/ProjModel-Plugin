@@ -44,7 +44,7 @@ public class AIClient {
             }
 
             JsonObject requestBody = new JsonObject();
-            requestBody.addProperty("model", "gemma2:2b");
+            requestBody.addProperty("model", "qwen2.5:3b");  // ← Новая модель
             requestBody.addProperty("prompt", fullPrompt);
             requestBody.addProperty("stream", false);
 
@@ -79,15 +79,6 @@ public class AIClient {
 
             if (responseJson.has("response")) {
                 String aiResponse = responseJson.get("response").getAsString();
-
-                // Если ответ не содержит HTML - добавляем базовое форматирование
-                if (!aiResponse.contains("<h3>") && !aiResponse.contains("<ul>")) {
-                    aiResponse = aiResponse
-                            .replace("\n\n", "</p><p>")
-                            .replace("\n", "<br>");
-                    aiResponse = "<p>" + aiResponse + "</p>";
-                }
-
                 return aiResponse;
             }
 
