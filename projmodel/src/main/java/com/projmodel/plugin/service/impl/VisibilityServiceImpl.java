@@ -131,6 +131,14 @@ public class VisibilityServiceImpl implements VisibilityService {
             return;
         }
 
+        if (rule.getProjectKey() == null || rule.getProjectKey().isBlank()
+                || rule.getRoleName() == null || rule.getRoleName().isBlank()
+                || rule.getAllowedLabels() == null
+                || rule.getAllowedLabels().isEmpty()) {
+
+            return;
+        }
+
         _ao.executeInTransaction(() -> {
             VisibilityRuleAO[] existingRules = _ao.find(
                     VisibilityRuleAO.class,
@@ -173,6 +181,13 @@ public class VisibilityServiceImpl implements VisibilityService {
 
     @Override
     public void grantTemporaryAccess(String projectKey, String issueKey, String username, int hours, ApplicationUser author) {
+        if (projectKey == null || projectKey.isBlank()
+                || issueKey == null || issueKey.isBlank()
+                || username == null || username.isBlank()) {
+
+            return;
+        }
+
         if (hours < 1 || hours > 720) {
             throw new IllegalArgumentException("Temporary access must be from 1 hour to 30 days");
         }
@@ -263,6 +278,9 @@ public class VisibilityServiceImpl implements VisibilityService {
     }
 
     private void saveDefaultRule(String projectKey, String roleName, List<String> labels) {
+        if(projectKey == null || roleName == null || labels.isEmpty()) {
+            return;
+        }
 
         String labelsStr = String.join(",", labels); // раньше было labels.toString();
         _ao.executeInTransaction(() -> {
