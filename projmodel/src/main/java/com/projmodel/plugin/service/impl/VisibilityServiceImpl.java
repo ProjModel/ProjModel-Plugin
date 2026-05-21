@@ -182,11 +182,12 @@ public class VisibilityServiceImpl implements VisibilityService {
         Date expiresAt = calendar.getTime();
 
         _ao.executeInTransaction(() -> {
-            TemporaryAccessAO access = _ao.create(TemporaryAccessAO.class);
-            access.setProjectKey(projectKey);
-            access.setIssueKey(issueKey);
-            access.setUsername(username);
-            access.setExpiresAt(expiresAt);
+            TemporaryAccessAO access = _ao.create(TemporaryAccessAO.class,
+                    new DBParam("PROJECT_KEY", projectKey),
+                    new DBParam("ISSUE_KEY", issueKey),
+                    new DBParam("USERNAME", username),
+                    new DBParam("EXPIRES_AT", expiresAt)
+                    );
             access.save();
 
             return null;
@@ -255,10 +256,10 @@ public class VisibilityServiceImpl implements VisibilityService {
             return;
         }
 
-        saveDefaultRule("TEST", "frontend", Arrays.asList("frontend", "ui"));
-        saveDefaultRule("TEST", "backend", Arrays.asList("backend", "api"));
-        saveDefaultRule("TEST", "tester", Arrays.asList("test", "qa"));
-        saveDefaultRule("TEST", "designer", Arrays.asList("design", "des"));
+        saveDefaultRule(projectKey, "frontend", Arrays.asList("frontend", "ui"));
+        saveDefaultRule(projectKey, "backend", Arrays.asList("backend", "api"));
+        saveDefaultRule(projectKey, "tester", Arrays.asList("test", "qa"));
+        saveDefaultRule(projectKey, "designer", Arrays.asList("design", "des"));
     }
 
     private void saveDefaultRule(String projectKey, String roleName, List<String> labels) {
