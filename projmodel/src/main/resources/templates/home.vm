@@ -13,6 +13,16 @@
         <p class="projmodel-version">Version: $pluginVersion</p>
     </div>
 
+    <div class="projmodel-topbar">
+        <a href="$req.contextPath/secure/Dashboard.jspa" class="projmodel-back-link">
+            ← В Jira Dashboard
+        </a>
+
+        <a href="$req.contextPath/secure/MyJiraHome.jspa" class="projmodel-back-link">
+            My Jira
+        </a>
+    </div>
+
     <div class="projmodel-grid">
        <div class="projmodel-card">
            <h2>Deadline Analysis</h2>
@@ -46,15 +56,7 @@
             </a>
         </div>
 
-        <!-- страница дебаг для тестов и проверки все ли работает (debug servlet можно менять как раз для проверок, страничка встроена)) -->
-        <div class="projmodel-card">
-            <h2>DEBUG FOR DEV</h2>
-            <p>Временная вкладка с переходом на DebugServlet для отображений различных компонентов системы</p>
-            <a href="$req.contextPath/plugins/servlet/debug" class="projmodel-badge-link">
-                <span class="projmodel-badge">перейти </span>
-            </a>
-        </div>
-
+        #if ($isTeamLead)
         <div class="projmodel-card">
             <h2>Visibility Settings</h2>
             <p>Настройка видимости задач по ролям участников проекта</p>
@@ -62,6 +64,7 @@
                 <span class="projmodel-badge">перейти</span>
             </a>
         </div>
+        #end
     </div>
 
     <div class="projmodel-footer">

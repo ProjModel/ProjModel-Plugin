@@ -83,33 +83,31 @@ public class VisibilityServiceImpl implements VisibilityService {
             return true;
         }
 
-        String userRole = getUserRole(user);
-
-        Optional<VisibilityRuleDTO> ruleOptional = getRulesForProject(projectKey).stream()
-                .filter(VisibilityRuleDTO::isEnabled)
-                .filter(rule -> rule.getRoleName().equalsIgnoreCase(userRole))
-                .findFirst();
-
-        if (!ruleOptional.isPresent()) {
-            return false;
-        }
-
-        VisibilityRuleDTO rule = ruleOptional.get();
-
         Set<String> issueLabels = issue.getLabels().stream()
                 .map(Label::getLabel)
                 .map(String::toLowerCase)
-                .collect(Collectors.toSet());;
+                .collect(Collectors.toSet());
 
-        return rule.getAllowedLabels().stream()
-                .map(String::toLowerCase)
-                .anyMatch(issueLabels::contains);
+        String username = user.getName().toLowerCase();
+
+        Set<String> usernameParts = Arrays.stream(username.split("[_\\-.]"))
+                .map(String::trim)
+                .filter(part -> !part.isEmpty())
+                .collect(Collectors.toSet());
+
+        for (String label : issueLabels) {
+            if (usernameParts.contains(label)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public List<VisibilityRuleDTO> getRulesForProject(String projectKey) {
 
-        createDefaultRulesIfNeeded();
+        createDefaultRulesIfNeeded(projectKey);
 
         if(projectKey == null || projectKey.isBlank()) {
             return Collections.emptyList();
@@ -131,6 +129,14 @@ public class VisibilityServiceImpl implements VisibilityService {
             return;
         }
 
+        if (rule.getProjectKey() == null || rule.getProjectKey().isBlank()
+                || rule.getRoleName() == null || rule.getRoleName().isBlank()
+                || rule.getAllowedLabels() == null
+                || rule.getAllowedLabels().isEmpty()) {
+
+            return;
+        }
+
         _ao.executeInTransaction(() -> {
             VisibilityRuleAO[] existingRules = _ao.find(
                     VisibilityRuleAO.class,
@@ -146,7 +152,12 @@ public class VisibilityServiceImpl implements VisibilityService {
             if (existingRules.length > 0) {
                 ruleAO = existingRules[0];
             } else {
-                ruleAO = _ao.create(VisibilityRuleAO.class);
+                ruleAO = _ao.create(
+                        VisibilityRuleAO.class,
+                        new DBParam("PROJECT_KEY", rule.getProjectKey()),
+                        new DBParam("ROLE_NAME", rule.getRoleName()),
+                        new DBParam("ALLOWED_LABELS", String.join(",", rule.getAllowedLabels()))
+                );
             }
 
             ruleAO.setProjectKey(rule.getProjectKey());
@@ -168,6 +179,13 @@ public class VisibilityServiceImpl implements VisibilityService {
 
     @Override
     public void grantTemporaryAccess(String projectKey, String issueKey, String username, int hours, ApplicationUser author) {
+        if (projectKey == null || projectKey.isBlank()
+                || issueKey == null || issueKey.isBlank()
+                || username == null || username.isBlank()) {
+
+            return;
+        }
+
         if (hours < 1 || hours > 720) {
             throw new IllegalArgumentException("Temporary access must be from 1 hour to 30 days");
         }
@@ -177,11 +195,12 @@ public class VisibilityServiceImpl implements VisibilityService {
         Date expiresAt = calendar.getTime();
 
         _ao.executeInTransaction(() -> {
-            TemporaryAccessAO access = _ao.create(TemporaryAccessAO.class);
-            access.setProjectKey(projectKey);
-            access.setIssueKey(issueKey);
-            access.setUsername(username);
-            access.setExpiresAt(expiresAt);
+            TemporaryAccessAO access = _ao.create(TemporaryAccessAO.class,
+                    new DBParam("PROJECT_KEY", projectKey),
+                    new DBParam("ISSUE_KEY", issueKey),
+                    new DBParam("USERNAME", username),
+                    new DBParam("EXPIRES_AT", expiresAt)
+                    );
             access.save();
 
             return null;
@@ -236,25 +255,32 @@ public class VisibilityServiceImpl implements VisibilityService {
         );
     }
 
-    private void createDefaultRulesIfNeeded() {
+    private void createDefaultRulesIfNeeded(String projectKey) {
+        if(projectKey == null || projectKey.isBlank()) {
+            return;
+        }
+
         VisibilityRuleAO[] existingRules = _ao.find(
                 VisibilityRuleAO.class,
-                Query.select().where("PROJECT_KEY = ?", "TEST")
+                Query.select().where("PROJECT_KEY = ?", projectKey)
         );
 
         if (existingRules.length > 0) {
             return;
         }
 
-        saveDefaultRule("TEST", "frontend", Arrays.asList("frontend", "ui"));
-        saveDefaultRule("TEST", "backend", Arrays.asList("backend", "api"));
-        saveDefaultRule("TEST", "tester", Arrays.asList("test", "qa"));
-        saveDefaultRule("TEST", "designer", Arrays.asList("design", "des"));
+        saveDefaultRule(projectKey, "frontend", Arrays.asList("frontend", "ui"));
+        saveDefaultRule(projectKey, "backend", Arrays.asList("backend", "api"));
+        saveDefaultRule(projectKey, "tester", Arrays.asList("test", "qa"));
+        saveDefaultRule(projectKey, "designer", Arrays.asList("design", "des"));
     }
 
     private void saveDefaultRule(String projectKey, String roleName, List<String> labels) {
+        if(projectKey == null || roleName == null || labels.isEmpty()) {
+            return;
+        }
 
-        String labelsStr = labels.toString();
+        String labelsStr = String.join(",", labels); // раньше было labels.toString();
         _ao.executeInTransaction(() -> {
             VisibilityRuleAO ruleAO = _ao.create(VisibilityRuleAO.class,
                     new DBParam("PROJECT_KEY", projectKey),
@@ -267,34 +293,11 @@ public class VisibilityServiceImpl implements VisibilityService {
         });
     }
 
-    private boolean isTeamLead(ApplicationUser user) {
+    public boolean isTeamLead(ApplicationUser user) {
         String username = user.getName().toLowerCase();
 
         return username.contains("admin")
                 || username.contains("lead")
                 || username.contains("teamlead");
     }
-
-    private String getUserRole(ApplicationUser user) {
-        String username = user.getName().toLowerCase();
-
-        if (username.contains("front")) {
-            return "frontend";
-        }
-
-        if (username.contains("back")) {
-            return "backend";
-        }
-
-        if (username.contains("test")) {
-            return "tester";
-        }
-
-        if(username.contains("design")) {
-            return "designer";
-        }
-
-        return "member";
-    }
-
 }
