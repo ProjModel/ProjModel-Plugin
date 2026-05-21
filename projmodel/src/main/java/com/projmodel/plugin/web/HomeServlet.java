@@ -1,5 +1,7 @@
 package com.projmodel.plugin.web;
 
+import com.atlassian.jira.component.ComponentAccessor;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
 
@@ -33,6 +35,26 @@ public class HomeServlet extends HttpServlet {
         context.put("pluginDescription", "Jira plugin for project analytics and team support");
         context.put("req", req);
 
+        ApplicationUser user =
+                ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+
+        boolean isTeamLead = isTeamLead(user);
+
+        context.put("isTeamLead", isTeamLead);
+
         templateRenderer.render("/templates/home.vm", context, resp.getWriter());
+    }
+
+    private boolean isTeamLead(ApplicationUser user) {
+
+        if (user == null) {
+            return false;
+        }
+
+        String username = user.getName().toLowerCase();
+
+        return username.contains("admin")
+                || username.contains("lead")
+                || username.contains("teamlead");
     }
 }

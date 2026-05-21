@@ -6,6 +6,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.projmodel.plugin.service.VisibilityService;
+import com.projmodel.plugin.service.impl.VisibilityServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -17,12 +18,12 @@ import java.io.IOException;
 @Named
 public class VisibilitySettingsServlet extends HttpServlet {
 
-    private final VisibilityService _visibilityService;
+    private final VisibilityServiceImpl _visibilityService;
     private final ProjectManager _projectManager;
 
     @Inject
     public VisibilitySettingsServlet(
-            VisibilityService visibilityService,
+            VisibilityServiceImpl visibilityService,
             @ComponentImport ProjectManager projectManager
     ) {
         _visibilityService = visibilityService;
@@ -36,6 +37,14 @@ public class VisibilitySettingsServlet extends HttpServlet {
         String projectKey = req.getParameter("projectKey");
 
         String enabledParam = req.getParameter("enabled");
+
+        ApplicationUser user =
+                ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
+
+        if (!_visibilityService.isTeamLead(user)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
 
         if (enabledParam != null) {
             _visibilityService.setEnabled(Boolean.parseBoolean(enabledParam)); //чтоб страница обновлялось и правильно показывала 

@@ -293,7 +293,7 @@ public class VisibilityServiceImpl implements VisibilityService {
         });
     }
 
-    private boolean isTeamLead(ApplicationUser user) {
+    public boolean isTeamLead(ApplicationUser user) {
         String username = user.getName().toLowerCase();
 
         return username.contains("admin")

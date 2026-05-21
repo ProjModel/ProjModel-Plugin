@@ -55,6 +55,7 @@
             </a>
         </div>
 
+        #if ($isTeamLead)
         <div class="projmodel-card">
             <h2>Visibility Settings</h2>
             <p>Настройка видимости задач по ролям участников проекта</p>
@@ -62,6 +63,7 @@
                 <span class="projmodel-badge">перейти</span>
             </a>
         </div>
+        #end
     </div>
 
     <div class="projmodel-footer">
