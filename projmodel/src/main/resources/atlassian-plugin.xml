@@ -91,4 +91,12 @@
         <url-pattern>/projmodel/report-request</url-pattern>
     </servlet>
 
+    <!-- AI Analytics Servlet -->
+    <servlet name="projmodel-ai-analytics"
+             key="projmodel-ai-analytics"
+             class="com.projmodel.plugin.web.AIAnalyticsServlet">
+        <description>ProjModel AI Analytics page</description>
+        <url-pattern>/projmodel/ai-analytics</url-pattern>
+    </servlet>
+
 </atlassian-plugin>
