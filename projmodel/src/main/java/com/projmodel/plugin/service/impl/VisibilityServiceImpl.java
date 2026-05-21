@@ -146,7 +146,12 @@ public class VisibilityServiceImpl implements VisibilityService {
             if (existingRules.length > 0) {
                 ruleAO = existingRules[0];
             } else {
-                ruleAO = _ao.create(VisibilityRuleAO.class);
+                ruleAO = _ao.create(
+                        VisibilityRuleAO.class,
+                        new DBParam("PROJECT_KEY", rule.getProjectKey()),
+                        new DBParam("ROLE_NAME", rule.getRoleName()),
+                        new DBParam("ALLOWED_LABELS", String.join(",", rule.getAllowedLabels()))
+                );
             }
 
             ruleAO.setProjectKey(rule.getProjectKey());
@@ -258,7 +263,7 @@ public class VisibilityServiceImpl implements VisibilityService {
 
     private void saveDefaultRule(String projectKey, String roleName, List<String> labels) {
 
-        String labelsStr = labels.toString();
+        String labelsStr = String.join(",", labels); // раньше было labels.toString();
         _ao.executeInTransaction(() -> {
             VisibilityRuleAO ruleAO = _ao.create(VisibilityRuleAO.class,
                     new DBParam("PROJECT_KEY", projectKey),
