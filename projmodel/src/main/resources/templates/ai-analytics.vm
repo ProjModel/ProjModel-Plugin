@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Analytics — ProjModel</title>
+    <link rel="stylesheet" type="text/css" href="$req.contextPath/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+    <style>
+        .ai-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .ai-tab {
+            padding: 10px 20px;
+            background: #f4f5f7;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #172b4d;
+            font-weight: 500;
+        }
+        .ai-tab.active {
+            background: #0052cc;
+            color: white;
+        }
+        .ai-analysis-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        .ai-analysis-content h3 {
+            color: #0052cc;
+            margin-top: 20px;
+        }
+        .ai-analysis-content ul {
+            margin-left: 20px;
+        }
+        .ai-analysis-content li {
+            margin: 10px 0;
+        }
+        .ai-error {
+            background: #ffebe6;
+            border-left: 4px solid #de350b;
+            padding: 20px;
+            border-radius: 8px;
+            color: #bf2600;
+        }
+        .ai-loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0052cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <a href="$req.contextPath/plugins/servlet/projmodel" class="projmodel-back-link">← На главную</a>
+        <h1>AI Analytics</h1>
+        <p class="projmodel-subtitle">Искусственный интеллект анализирует ваш проект и даёт рекомендации</p>
+    </div>
+
+    <!-- Форма выбора проекта -->
+    <div class="projmodel-card" style="margin-bottom: 24px;">
+        <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/ai-analytics" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <label for="projectKey" style="font-weight: 600;">Проект:</label>
+            <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 10px; border: 1px solid #dfe1e6; border-radius: 6px;">
+                #foreach($project in $projects)
+                    <option value="$project.getKey()" #if($projectKey == $project.getKey())selected#end>
+                        $project.getKey() — $project.getName()
+                    </option>
+                #end
+            </select>
+            <input type="hidden" name="type" value="$!analysisType">
+        </form>
+    </div>
+
+    #if($projectKey)
+        <!-- Вкладки анализа -->
+        <div class="ai-tabs">
+            <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics?projectKey=$projectKey&type=general"
+               class="ai-tab #if($analysisType == 'general')active#end">
+                Общий анализ
+            </a>
+            <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics?projectKey=$projectKey&type=deadlines"
+               class="ai-tab #if($analysisType == 'deadlines')active#end">
+                Дедлайны
+            </a>
+            <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics?projectKey=$projectKey&type=workload"
+               class="ai-tab #if($analysisType == 'workload')active#end">
+                Загрузка
+            </a>
+        </div>
+
+        <!-- Сводка данных -->
+        <div class="projmodel-card" style="margin-bottom: 20px;">
+            <h3>Данные для анализа</h3>
+            <p>
+                Задач с дедлайнами: $deadlineIssues.size() |
+                Участников в анализе загрузки: $workloadData.size()
+            </p>
+        </div>
+
+        #if($aiAnalysis)
+            <div class="ai-analysis-content" style="white-space: pre-line;">
+                $aiAnalysis
+            </div>
+        #elseif($aiError)
+            <div class="ai-error">
+                <h3>Ошибка AI-анализа</h3>
+                <p>$aiError</p>
+                <p>Попробуйте обновить страницу или проверьте подключение к API DeepSeek.</p>
+            </div>
+        #else
+            <div class="ai-loading">
+                <h3>AI анализирует проект...</h3>
+                <div class="spinner"></div>
+                <p>Пожалуйста, подождите. Это может занять несколько секунд.</p>
+            </div>
+        #end
+
+    #else
+        <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
+            <div class="projmodel-mvp-badge">Выберите проект</div>
+            <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
+                Выберите проект для AI-анализа из выпадающего списка.
+            </p>
+        </div>
+    #end
+
+    <div class="projmodel-footer">
+        ProjModel — AI-Powered Jira Assistant
+    </div>
+</div>
+</body>
+</html>

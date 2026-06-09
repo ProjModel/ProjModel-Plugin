@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Deadline Analysis — ProjModel</title>
+    <link rel="stylesheet" type="text/css" href="$req.contextPath/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <a href="$req.contextPath/plugins/servlet/projmodel" class="projmodel-back-link">← На главную</a>
+        <h1>Deadline Analysis</h1>
+        <p class="projmodel-subtitle">Анализ дедлайнов и уровней риска по проекту</p>
+    </div>
+
+    <!-- Форма выбора проекта -->
+    <div class="projmodel-card" style="margin-bottom: 24px;">
+        <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/deadline" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <label for="projectKey" style="font-weight: 600; white-space: nowrap;">Проект:</label>
+            <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #dfe1e6; border-radius: 6px; font-size: 14px; min-width: 250px;">
+                #if($projects.isEmpty())
+                    <option value="">-- Нет доступных проектов --</option>
+                #else
+                    #foreach($project in $projects)
+                        <option value="$project.getKey()" #if($projectKey == $project.getKey())selected#end>
+                            $project.getKey() — $project.getName()
+                        </option>
+                    #end
+                #end
+            </select>
+            <noscript>
+                <button type="submit" style="padding: 10px 24px; background: #0052cc; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Анализировать
+                </button>
+            </noscript>
+        </form>
+    </div>
+
+    #if($projectKey && $deadlineIssues && !$deadlineIssues.isEmpty())
+        <!-- Сводная статистика -->
+        <div class="deadline-stats">
+            <div class="stat-card">
+                <div class="stat-number">$stats.total</div>
+                <div class="stat-label">Всего задач</div>
+            </div>
+            <div class="stat-card stat-critical">
+                <div class="stat-number">$stats.critical</div>
+                <div class="stat-label">Критический риск</div>
+            </div>
+            <div class="stat-card stat-high">
+                <div class="stat-number">$stats.high</div>
+                <div class="stat-label">Высокий риск</div>
+            </div>
+            <div class="stat-card stat-medium">
+                <div class="stat-number">$stats.medium</div>
+                <div class="stat-label">Средний риск</div>
+            </div>
+            <div class="stat-card stat-low">
+                <div class="stat-number">$stats.low</div>
+                <div class="stat-label">Низкий риск</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" style="color: #999;">$stats.noDeadline</div>
+                <div class="stat-label">Без дедлайна</div>
+            </div>
+        </div>
+
+        <!-- Таблица задач -->
+        <div class="deadline-table-wrapper">
+            <table class="deadline-table">
+                <thead>
+                    <tr>
+                        <th>Ключ</th>
+                        <th>Название</th>
+                        <th>Исполнитель</th>
+                        <th>Дедлайн</th>
+                        <th>Статус</th>
+                        <th>Уровень риска</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #foreach($issue in $deadlineIssues)
+                        <tr class="$issue.getRowClass()">
+                            <td><strong>$issue.getIssueKey()</strong></td>
+                            <td>$issue.getSummary()</td>
+                            <td>$issue.getAssignee()</td>
+                            <td>
+                                #if($issue.getDueDate())
+                                    $issue.getDueDate()
+                                #else
+                                    <span style="color: #999; font-style: italic;">—</span>
+                                #end
+                            </td>
+                            <td>$issue.getStatus()</td>
+                            <td><span class="risk-badge $issue.getRiskBadge()">$issue.getRiskText()</span></td>
+                        </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+
+    #elseif($projectKey)
+        <!-- Проект выбран, но нет задач -->
+        <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
+            <div class="projmodel-mvp-badge">Нет данных</div>
+            <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
+                В проекте <strong>$projectKey</strong> нет незавершённых задач для анализа.
+            </p>
+        </div>
+    #else
+        <!-- Проект не выбран -->
+        <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
+            <div class="projmodel-mvp-badge">Выберите проект</div>
+            <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
+                Выберите проект из выпадающего списка для отображения анализа дедлайнов.
+            </p>
+        </div>
+    #end
+
+    <div class="projmodel-footer">
+        ProjModel — умный помощник для Jira
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>$pluginName</title>
+    <link rel="stylesheet" type="text/css" href="$req.contextPath/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <h1>$pluginName</h1>
+        <p class="projmodel-subtitle">$pluginDescription</p>
+        <p class="projmodel-version">Version: $pluginVersion</p>
+    </div>
+
+    <div class="projmodel-topbar">
+        <a href="$req.contextPath/secure/Dashboard.jspa" class="projmodel-back-link">
+            ← В Jira Dashboard
+        </a>
+
+        <a href="$req.contextPath/secure/MyJiraHome.jspa" class="projmodel-back-link">
+            My Jira
+        </a>
+    </div>
+
+    <div class="projmodel-grid">
+       <div class="projmodel-card">
+           <h2>Deadline Analysis</h2>
+           <p>Визуализация дедлайнов проекта и уровней риска</p>
+           <a href="$req.contextPath/plugins/servlet/projmodel/deadline" class="projmodel-badge-link">
+               <span class="projmodel-badge">перейти</span>
+           </a>
+       </div>
+
+        <div class="projmodel-card">
+            <h2>Reports</h2>
+            <p>Экспорт данных проекта и формирование отчётов</p>
+            <a href="$req.contextPath/plugins/servlet/projmodel/report-request" class="projmodel-badge-link">
+                <span class="projmodel-badge">Создать отчёт</span>
+            </a>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>Workload</h2>
+            <p>Отслеживание загрузки участников команды</p>
+            <a href="$req.contextPath/plugins/servlet/projmodel/workload" class="projmodel-badge-link">
+                <span class="projmodel-badge">перейти </span>
+            </a>
+        </div>
+
+        <div class="projmodel-card">
+            <h2>AI Analytics</h2>
+            <p>Прогнозы сроков, рисков и аналитические рекомендации от DeepSeek AI</p>
+            <a href="$req.contextPath/plugins/servlet/projmodel/ai-analytics" class="projmodel-badge-link">
+                <span class="projmodel-badge">Запустить AI-анализ</span>
+            </a>
+        </div>
+
+        #if ($isTeamLead)
+        <div class="projmodel-card">
+            <h2>Visibility Settings</h2>
+            <p>Настройка видимости задач по ролям участников проекта</p>
+            <a href="$req.contextPath/plugins/servlet/projmodel/visibility-settings" class="projmodel-badge-link">
+                <span class="projmodel-badge">перейти</span>
+            </a>
+        </div>
+        #end
+    </div>
+
+    <div class="projmodel-footer">
+        Demo page for ProjModel plugin
+    </div>
+</div>
+</body>
+</html>

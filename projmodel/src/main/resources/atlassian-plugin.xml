@@ -1,4 +1,4 @@
-<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+﻿<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
     <plugin-info>
         <description>${project.description}</description>
         <version>${project.version}</version>
@@ -18,7 +18,7 @@
         <resource type="download" name="projmodel.js" location="/js/projmodel.js"/>
         <resource type="download" name="images/" location="/images"/>
 
-        <context>projmodel</context>
+        <context>atl.general</context>
     </web-resource>
 
     <servlet name="hello-servlet"
@@ -27,5 +27,69 @@
         <description>Hello Servlet</description>
         <url-pattern>/hello</url-pattern>
     </servlet>
-    
+
+    <servlet name="projmodel-home"
+             key="projmodel-home"
+             class="com.projmodel.plugin.web.HomeServlet">
+        <description>ProjModel home page</description>
+        <url-pattern>/projmodel</url-pattern>
+    </servlet>
+
+    <web-item key="projmodel-menu-item"
+              name="ProjModel Menu Item"
+              section="system.top.navigation.bar"
+              weight="1000">
+        <label key="projmodel.menu.label"/>
+        <link linkId="projmodel-link">/plugins/servlet/projmodel</link>
+    </web-item>
+
+    <!-- Модуль Active Objects для работы с базой данных -->
+    <ao key="ao-module">
+        <description>База данных плагина ProjModel</description>
+        <entity>com.projmodel.plugin.ao.ReminderLogAO</entity>
+        <entity>com.projmodel.plugin.ao.ReportTaskAO</entity>
+        <entity>com.projmodel.plugin.ao.VisibilityRuleAO</entity>
+        <entity>com.projmodel.plugin.ao.TemporaryAccessAO</entity>
+
+    </ao>
+
+    <!-- Workload Servlet -->
+    <servlet name="projmodel-workload"
+             key="projmodel-workload"
+             class="com.projmodel.plugin.web.WorkloadServlet">
+        <description>ProjModel workload page</description>
+        <url-pattern>/projmodel/workload</url-pattern>
+    </servlet>
+
+    <!-- Deadline Servlet -->
+    <servlet name="projmodel-deadline"
+             key="projmodel-deadline"
+             class="com.projmodel.plugin.web.DeadlineServlet">
+        <description>ProjModel deadline analysis page</description>
+        <url-pattern>/projmodel/deadline</url-pattern>
+    </servlet>
+
+    <servlet name="visibility-settings-servlet"
+             key="visibility-settings-servlet"
+             class="com.projmodel.plugin.web.VisibilitySettingsServlet">
+        <description>ProjModel Visibility Settings</description>
+        <url-pattern>/projmodel/visibility-settings</url-pattern>
+    </servlet>
+
+    <!-- Report Request Servlet -->
+    <servlet name="projmodel-report-request"
+             key="projmodel-report-request"
+             class="com.projmodel.plugin.web.ReportRequestServlet">
+        <description>Создание и скачивание отчётов ProjModel</description>
+        <url-pattern>/projmodel/report-request</url-pattern>
+    </servlet>
+
+    <!-- AI Analytics Servlet -->
+    <servlet name="projmodel-ai-analytics"
+             key="projmodel-ai-analytics"
+             class="com.projmodel.plugin.web.AIAnalyticsServlet">
+        <description>ProjModel AI Analytics page</description>
+        <url-pattern>/projmodel/ai-analytics</url-pattern>
+    </servlet>
+
 </atlassian-plugin>

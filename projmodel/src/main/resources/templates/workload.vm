@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>$pageTitle</title>
+    <link rel="stylesheet" type="text/css" href="$req.contextPath/download/resources/com.projmodel.projmodel:projmodel-resources/projmodel.css">
+</head>
+<body>
+<div class="projmodel-container">
+    <div class="projmodel-header">
+        <a href="$req.contextPath/plugins/servlet/projmodel" class="projmodel-back-link">← На главную</a>
+        <h1>$pageTitle</h1>
+        <p class="projmodel-subtitle">$pageDescription</p>
+        <p class="projmodel-version">Version: 1.0.0-demo</p>
+    </div>
+
+    <!-- Форма выбора проекта -->
+    <div class="projmodel-card" style="margin-bottom: 24px;">
+        <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/workload" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <label for="projectKey" style="font-weight: 600; white-space: nowrap;">Проект:</label>
+            <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #dfe1e6; border-radius: 6px; font-size: 14px; min-width: 250px;">
+                #if($projects.isEmpty())
+                    <option value="">-- Нет доступных проектов --</option>
+                #else
+                    #foreach($project in $projects)
+                        <option value="$project.getKey()" #if($projectKey == $project.getKey())selected#end>
+                            $project.getKey() — $project.getName()
+                        </option>
+                    #end
+                #end
+            </select>
+            <noscript>
+                <button type="submit" style="padding: 10px 24px; background: #0052cc; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Показать
+                </button>
+            </noscript>
+        </form>
+    </div>
+
+    #if($workloadData && !$workloadData.isEmpty())
+        <!-- Легенда цветов -->
+        <div class="workload-legend">
+            <div class="legend-item">
+                <div class="legend-color legend-green"></div>
+                <span>Нормальная загрузка</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-yellow"></div>
+                <span>Средняя загрузка</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-red"></div>
+                <span>Высокая / Критическая загрузка</span>
+            </div>
+        </div>
+
+        <!-- Таблица загрузки участников -->
+        <div class="workload-table-wrapper">
+            <table class="workload-table">
+                <thead>
+                    <tr>
+                        <th>Исполнитель</th>
+                        <th>Всего задач</th>
+                        <th>Дедлайн ≤ 7 дн.</th>
+                        <th>Просрочено</th>
+                        <th>Без дедлайна</th>
+                        <th>Уровень нагрузки</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #foreach($item in $workloadData)
+                        #set($rowClass = "workload-low")
+                        #set($statusClass = "status-green")
+                        #set($statusText = "Низкая")
+                        #if($item.loadLevel == "critical")
+                            #set($rowClass = "workload-high")
+                            #set($statusClass = "status-red")
+                            #set($statusText = "Критическая")
+                        #elseif($item.loadLevel == "high")
+                            #set($rowClass = "workload-high")
+                            #set($statusClass = "status-red")
+                            #set($statusText = "Высокая")
+                        #elseif($item.loadLevel == "medium")
+                            #set($rowClass = "workload-medium")
+                            #set($statusClass = "status-yellow")
+                            #set($statusText = "Средняя")
+                        #end
+
+                        <tr class="$rowClass">
+                            <td class="workload-name">$item.assignee</td>
+                            <td>$item.totalTasks</td>
+                            <td>$item.tasksDueWithin7Days</td>
+                            <td>$item.overdueTasks</td>
+                            <td>$item.tasksWithoutDueDate</td>
+                            <td><span class="workload-status $statusClass">$statusText</span></td>
+                        </tr>
+                    #end
+                </tbody>
+            </table>
+        </div>
+    #else
+        <div class="projmodel-card" style="text-align: center; padding: 60px 20px;">
+            <div class="projmodel-mvp-badge">Нет данных</div>
+            <p style="font-size: 18px; margin: 30px 0; color: #5e6c84;">
+                Для проекта $projectKey нет незавершённых задач или проект не найден.
+            </p>
+        </div>
+    #end
+
+    <div class="projmodel-footer">
+        ProjModel — умный помощник для Jira
+    </div>
+</div>
+</body>
+</html>
