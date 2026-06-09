@@ -14,6 +14,29 @@
         <p class="projmodel-version">Version: 1.0.0-demo</p>
     </div>
 
+    <!-- Форма выбора проекта -->
+    <div class="projmodel-card" style="margin-bottom: 24px;">
+        <form method="GET" action="$req.contextPath/plugins/servlet/projmodel/workload" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <label for="projectKey" style="font-weight: 600; white-space: nowrap;">Проект:</label>
+            <select name="projectKey" id="projectKey" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #dfe1e6; border-radius: 6px; font-size: 14px; min-width: 250px;">
+                #if($projects.isEmpty())
+                    <option value="">-- Нет доступных проектов --</option>
+                #else
+                    #foreach($project in $projects)
+                        <option value="$project.getKey()" #if($projectKey == $project.getKey())selected#end>
+                            $project.getKey() — $project.getName()
+                        </option>
+                    #end
+                #end
+            </select>
+            <noscript>
+                <button type="submit" style="padding: 10px 24px; background: #0052cc; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Показать
+                </button>
+            </noscript>
+        </form>
+    </div>
+
     #if($workloadData && !$workloadData.isEmpty())
         <!-- Легенда цветов -->
         <div class="workload-legend">
